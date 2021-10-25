@@ -46,8 +46,8 @@ operación solicitada
 # ___________________________________________________
 
 
-airportfile = 'Skylines//airports-utf8-small.csv'
-routefile = 'Skylines//routes-utf8-small.csv'
+airportfile = 'Skylines//airports-utf8-large.csv'
+routefile = 'Skylines//routes-utf8-large.csv'
 citiesfile = 'Skylines//worldcities-utf8.csv'
 initialStation = None
 
@@ -83,8 +83,8 @@ def graph_info(analyzer):
     pareja_final1 = m.get(analyzer["iataInfo"], ultimo_iata)
     info_list2 = me.getValue(pareja_final1)
     last_ap_list = []
-    for elemento in lt.iterator(info_list2):
-        last_ap_list.append(str(elemento))
+    for elemento2 in lt.iterator(info_list2):
+        last_ap_list.append(str(elemento2))
     
     table1 =[first_ap_list, last_ap_list]
     headliners1 = ["Name", "City", "Country", "Longitude", "Latitude"]
@@ -99,6 +99,25 @@ def graph_info(analyzer):
     print("Edges: " + str(num4))
     print("First & Last Airport loaded in the Graph." + "\n")
 
+    first_iata = lt.firstElement(analyzer["doubleList"])
+    first_pair = m.get(analyzer["iataInfo"], first_iata)
+    first_value = me.getValue(first_pair)
+
+    f_i_l = []
+    for elemento3 in lt.iterator(first_value):
+        f_i_l.append(elemento3)
+
+    last_iata = lt.lastElement(analyzer["doubleList"])
+    last_pair = m.get(analyzer["iataInfo"], last_iata)
+    last_value = me.getValue(last_pair)
+
+    l_i_l = []
+    for elemento4 in lt.iterator(last_value):
+        l_i_l.append(elemento4)
+
+    table2 = [f_i_l, l_i_l]
+    headliners2 = ["Name", "City", "Country", "Longitude", "Latitude"]
+    print(tabulate(table2, headers=headliners2, tablefmt="grid") + "\n")
     
     #Third Table
     num5 = m.size(analyzer["cityInfo"])
@@ -130,28 +149,60 @@ def graph_info(analyzer):
 
 def interconection(analyzer):
     answer = controller.interconection(analyzer)
-    org = sorted(answer, key=lambda x:x[4], reverse=True)
+    org = sorted(answer, key=lambda ans:ans[4], reverse=True)
     table5 = org[:5]
     headliners = ["Name", "City", "Country", "IATA", "connections", "inbound", "outbound"]
-    print("Connected airports inside network: " + str(len(org)) + "\n")
+    print("\n=== Req No. 1 Answer ===")
+    print("Connected airports inside network: " + str(len(org)))
     print("TOP 5 most connected airports..." + "\n")
     print(tabulate(table5, headers=headliners, tablefmt="grid") + "\n")
      
 def clusteres (analyzer, iataAp1, iataAp2):
     answer = controller.clusteres(analyzer, iataAp1, iataAp2)
-    number = answer[0]
-    chain = answer[1]
-    if chain == False:
-        cond = " not "
-    else:
-        cond = ""
-    print("The total number of clusters present in the network is: " + number)
-    print("The two airports identified with the IATAS: " + iataAp1 + " & " + iataAp2 + " are " + cond + " located on the same cluster." + "\n")
+    components = answer[0]
+    connection = answer[1]
+    ap1 = m.get(analyzer["iataInfo"], iataAp1)
+    val1 = me.getValue(ap1)
+    a_1_L = [iataAp1]
+    i = 0
+    for el1 in lt.iterator(val1):
+        if i < 3:
+            a_1_L.append(el1)
+        i += 1
+    ap2 = m.get(analyzer["iataInfo"], iataAp2)
+    val2 = me.getValue(ap2)
+    a_2_L = [iataAp2]
+    j = 0
+    for el2 in lt.iterator(val2):
+        if j < 3:
+            a_2_L.append(el2)
+        j += 1
+    table = [a_1_L, a_2_L]
+
+    headliners = ["IATA", "Name", "City", "Country"]
+
+    print("=== Req No. 2 Answer ===")
+    print(tabulate(table, headers=headliners, tablefmt="grid") + "\n")
+    print("- Number of SCC in Airport-Route network: " + str(components))
+    print("- Does the " + a_1_L[1] + " and the " + a_2_L[1] + " belong together?")
+    print("- ANS:" + str(connection) + "\n")
 
 def shortestRoute (analyzer, origin, destiny):
     answer = controller.shortestRoute(analyzer, origin, destiny)
+    table1 = answer[0]
+    table2 = answer[1]
+    tDistance = 0
+    for flight in table1:
+        tDistance += float(flight[2])
 
-
+    headliners1 = ["Departure", "Destination", "distance_km"]
+    headliners2 = ["IATA", "Latitude", "Longitude"]
+    print("=== Req No. 3 ===")
+    print("- Total distance: " + str(round(tDistance, 2)) + " (km)")
+    print("- Trip Path:")
+    print(tabulate(table1, headers=headliners1, tablefmt="grid"))
+    print("- Trip Stops:")
+    print(tabulate(table2, headers=headliners2, tablefmt="grid") + "\n")
 
 def travelerMiles (analyzer, origin, miles):
     answer = controller.travelerMiles(analyzer, origin, miles)
@@ -170,11 +221,14 @@ def chooseCity (analyzer, city):
     correctLine = 0
     headliners = ["Option Number", "city", "country", "population", "lat", "lng", "id"] 
     if len(answer) > 1:
-        print(tabulate(answer, headers=headliners, tablefmt="pretty") + "\n")
+        print(tabulate(answer, headers=headliners, tablefmt="grid") + "\n")
         correctLine = int(input("Type the option number of the city you would like to choose: "))-1
     chosenCity = answer[correctLine][1] + "-" + str(answer[correctLine][-1])
     return chosenCity
 
+def shortestAirport (analyzer, city):
+    answer = controller.shortestAirport(analyzer, city)
+    return answer
 # ___________________________________________________
 #  Menu principal
 # ___________________________________________________
@@ -222,7 +276,11 @@ while True:
         c_origin = chooseCity(analyzer, origin)
         destiny = input("Enter the name of the destination city: ").upper()
         c_destiny = chooseCity(analyzer, destiny)
-        print(shortestRoute(analyzer, c_origin, c_destiny))        
+        ap1 = shortestAirport(analyzer, c_origin)
+        source = ap1[0]
+        ap2 = shortestAirport(analyzer, c_destiny)
+        vertex = ap2[0]
+        print(shortestRoute(analyzer, source, vertex))        
 
     elif int(inputs[0]) == 6:
         origin = input("Enter the name of the departure city: ").upper()

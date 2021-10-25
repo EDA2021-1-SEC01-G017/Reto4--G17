@@ -64,12 +64,12 @@ def loadData(analyzer, airportfile, routefile, cityfile):
     input_filecity = csv.DictReader(open(citiesfile, encoding="utf-8"),
                                 delimiter=",")
     
-    #Funcional
+    
     for airport in input_fileair:  
         model.add_info(analyzer, airport)
 
     for route in input_filerout:  
-       model.add_edge(analyzer, route)
+        model.add_edge(analyzer, route)
     
     for city in input_filecity:
         model.add_city(analyzer, city)
@@ -114,4 +114,7 @@ def graphVis ():
 
 def chooseCity (analyzer, city):
     return model.chooseCity(analyzer, city)
+
+def shortestAirport (analyzer, city):
+    return model.shortestAirport(analyzer, city)
 

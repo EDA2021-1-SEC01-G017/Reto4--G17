@@ -27,7 +27,7 @@
 
 
 import config 
-
+from haversine import haversine
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.DataStructures import mapentry as me
@@ -60,15 +60,18 @@ def newAnalyzer():
     """
     try:
         analyzer = {
+                    'iataLocation':None,
+                    'doubleList' : None,
                     'iataInfo': None,
                     'distances': None,
                     'routeMap': None,
                     'cityInfo': None,
                     'vuelos': None,
                     'doubleRoutes': None,
-                    'existCheck': None
+                    'existCheck': None,
                     }
-        
+        analyzer['iataLocation'] = []
+        analyzer['doubleList'] = lt.newList()
         analyzer['iataInfo'] = m.newMap(numelements=20000,
                                      maptype='PROBING',
                                      loadfactor=0.5
@@ -87,7 +90,7 @@ def newAnalyzer():
                                      )
         analyzer["vuelos"] = gr.newGraph(datastructure='ADJ_LIST',
                                               directed=True,
-                                              size=400,
+                                              size=20000,
                                               comparefunction=compareroutes
                                               )                              
         analyzer["doubleRoutes"] = gr.newGraph(datastructure='ADJ_LIST',
@@ -95,6 +98,7 @@ def newAnalyzer():
                                               size=20000,
                                               comparefunction=compareroutes
                                               )
+        
         
         return analyzer
     except Exception as exp:
@@ -114,6 +118,8 @@ def add_info (analyzer, airport):
     intlist1 = lt.newList()
     m.put(analyzer["routeMap"], airport["IATA"], intlist1)
     gr.insertVertex(analyzer["vuelos"], airport["IATA"])
+    line = [airport["IATA"], airport["Latitude"], airport["Longitude"]]
+    analyzer["iataLocation"].append(line)
 
 
 def add_edge (analyzer, route):
@@ -153,25 +159,29 @@ def double_check(analyzer):
             if lt.isPresent(value2, dep) != 0:
                 if gr.containsVertex(analyzer["doubleRoutes"], dep) == False:
                     gr.insertVertex(analyzer["doubleRoutes"], dep)
+                    if lt.isPresent(analyzer["doubleList"], dep) == 0:
+                        lt.addLast(analyzer["doubleList"], dep)
                 if gr.containsVertex(analyzer["doubleRoutes"], des) == False:
                     gr.insertVertex(analyzer["doubleRoutes"], des)
+                    if lt.isPresent(analyzer["doubleList"], des) == 0:
+                        lt.addLast(analyzer["doubleList"], des)
                 join_key = dep + "-" + des
                 distance_pair = m.get(analyzer["distances"], join_key)
                 distance_val = me.getValue(distance_pair)
                 gr.addEdge(analyzer["doubleRoutes"], dep, des, distance_val)
                 pos_del1 = lt.isPresent(value1, des)
                 pos_del2 = lt.isPresent(value2, dep)
-                lt.deleteElement(value1, pos_del1)
-                lt.deleteElement(value2, pos_del2)
+                #lt.deleteElement(value1, pos_del1)
+                #lt.deleteElement(value2, pos_del2)
     
 def interconection (analyzer):
     iataList = m.keySet(analyzer["iataInfo"])
     table = []
     for iata in lt.iterator(iataList):
         vertexList = gr.adjacents(analyzer["vuelos"], iata)
-        inNumb = gr.indegree(analyzer["vuelos"], iata)
-        outNumb = gr.outdegree(analyzer["vuelos"], iata)
-        numVertex = lt.size(vertexList)
+        inNumb = int(gr.indegree(analyzer["vuelos"], iata))
+        outNumb = int(gr.outdegree(analyzer["vuelos"], iata))
+        numVertex = inNumb + outNumb
         line = []
         path = m.get(analyzer["iataInfo"], iata)
         values = me.getValue(path)
@@ -182,18 +192,57 @@ def interconection (analyzer):
         line.append(nombre) 
         line.append(ciudad) 
         line.append(pais)
-        line.append(str(numVertex))
+        line.append(numVertex)
         line.append(inNumb)
         line.append(outNumb)
-        table.append(line)
+        if (numVertex > 0):
+            table.append(line)
     return table                                      
 
 def clusteres (analyzer, iataAp1, iataAp2):
-    
-    pass
+    kosaraju = scc.KosarajuSCC(analyzer["vuelos"])
+    components = scc.connectedComponents(kosaraju)
+    connection = scc.stronglyConnected(kosaraju, iataAp1, iataAp2)
+    answer = (components, connection)
+    return answer
 
 def shortestRoute (analyzer, origin, destiny):
-    pass
+    dijkstra = djk.Dijkstra(analyzer["vuelos"], origin)
+    recorrido = djk.pathTo(dijkstra, destiny)
+    flightList = []
+    for i in lt.iterator(recorrido):
+        flightList.append(i)
+    
+    j = 0
+    table1 = []
+    route = []
+    for dic in flightList:
+        linea = []
+        linea.append(dic["vertexA"])
+        linea.append(dic["vertexB"])
+        linea.append(dic["weight"])
+        table1.append(linea)
+        if j == 0:
+            route.append(dic["vertexA"])
+            route.append(dic["vertexB"])
+        else:
+            route.append(dic["vertexB"])
+        j += 1
+
+    table2 = []
+    for iata in route:
+        pair = m.get(analyzer["iataInfo"], iata)
+        value = me.getValue(pair)
+        k = 0
+        linea2 = [iata]
+        for element in lt.iterator(value):
+            if k < 3:
+                linea2.append(element)
+            k += 1
+        table2.append(linea2)
+
+    answerTuple = (table1, table2)
+    return answerTuple
 
 def travelerMiles (analyzer, origin, miles):
     pass
@@ -226,6 +275,49 @@ def chooseCity (analyzer, city):
             table.append(line)
     
     return table
+
+def shortestAirport (analyzer, city):
+    pair = m.get(analyzer["cityInfo"], city)
+    value = me.getValue(pair)
+    i = 0
+    city_lat = None
+    city_lon = None
+    for element in lt.iterator(value):
+        if i == 2:
+            city_lat = element
+        if i == 3:
+            city_lon = element
+        i += 1
+    cityLoc = (float(city_lat), float(city_lon))
+    org_matrix = sorted(analyzer["iataLocation"], key=lambda x:x[1])
+    distanceDict = {}
+    for airport in org_matrix:
+        airLat = airport[1]
+        airLon = airport[2]
+        airTup = (float(airLat), float(airLon))
+        distance = haversine(cityLoc, airTup)
+        distanceDict[airport[0]] = distance
+    minIata = None
+    minDis = 999999999
+    for iata in distanceDict:
+        disValue = distanceDict[iata]
+        if disValue < minDis:
+            minDis = disValue
+            minIata = iata
+    wishedPair = m.get(analyzer["iataInfo"], minIata)
+    wishedValue = me.getValue(wishedPair)
+    wishedAirport = [minIata]
+    for j in lt.iterator(wishedValue):
+        wishedAirport.append(j)
+    return wishedAirport
+
+
+
+
+
+
+
+    
     
 
             
