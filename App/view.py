@@ -20,10 +20,13 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
+import time
 import config as cf
 import sys
+import threading
 import controller
 from DISClib.ADT import list as lt
+from DISClib.ADT import stack
 assert cf
 
 
@@ -34,10 +37,32 @@ se hace la solicitud al controlador para ejecutar la
 operación solicitada
 """
 
+# ___________________________________________________
+#  Variables
+# ___________________________________________________
+
+#TODO
+servicefile = 'skylines.csv'
+initialStation = None
+
+
+# ___________________________________________________
+#  Menu principal
+# ___________________________________________________
+
+
 def printMenu():
     print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("1- Inicializar Analizador")
+    print("2- Cargar información de OVNIS")
+    print("3- REQ1-")
+    print("4- REQ2-")
+    print("5- REQ3-")
+    print("6- REQ4-")
+    print("7- REQ5-")
+    print("8- REQ6BONO-Visualizar avistamientos en una zona geográfica /--Long(Limite máx y min) Lat(Límite máx y min)--/")
+    print("0- Salir")
+    print("*******************************************")
 
 catalog = None
 
@@ -48,9 +73,28 @@ while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
-        print("Cargando información de los archivos ....")
+        print("\nInicializando....")
+        
+        archive = controller.init()
 
     elif int(inputs[0]) == 2:
+        print("\nCargando información de avistamientos....")
+        controller.loadData(archive, route) 
+    
+    #EJEMPLO PARA ACOMODAR CADA REQ
+    elif int(inputs[0]) == 3:
+        #TITULO DEL REQ
+        print("\nREQ1-Buscando OVNIS en una ciudad: ")
+        #INPUTS REQUERIDOS
+        City = input("Ingrese la ciudad: ")
+        #USO DE FUNCIÓN
+        total = getOvnisInCity(archive, City)
+        #IMPRESIÓN DE RESULTADOS
+        print(total)
+        print("Altura del arbol: " + str(om.height(archive['DateIndex'])))
+        print('Elementos en el arbol: ' + str(om.size(archive['DateIndex'])))
+
+    elif int(inputs[0]) == 4:
         pass
 
     else:
