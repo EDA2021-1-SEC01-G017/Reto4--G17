@@ -42,15 +42,34 @@ def init():
     return analyzer
 # Funciones para la carga de datos
 
-def loadData(analyzer, airportfile):
+def loadData(analyzer, airportfile, routfile, cityfile):
     """
     Carga los datos de los archivos CSV en el modelo
     """
     airportsfile = cf.data_dir + airportfile
-    input_file = csv.DictReader(open(airportsfile, encoding="utf-8"),
+
+    routsfile = cf.data_dir + cityfile
+
+    citiesfile = cf.data_dir + routfile
+
+    input_fileair = csv.DictReader(open(airportsfile, encoding="utf-8"),
                                 delimiter=",")
-    for airport in input_file:
+    
+    input_filerout = csv.DictReader(open(routsfile, encoding="utf-8"),
+                                delimiter=",")
+
+    input_filecity = csv.DictReader(open(citiesfile, encoding="utf-8"),
+                                delimiter=",")
+    
+    for airport in input_fileair:
         model.add_info(analyzer, airport)
+
+    for rout in input_filerout:
+        model.add_info(analyzer, rout)
+
+    for city in input_filecity:
+        model.add_info(analyzer, city)
+
     return analyzer
 
 

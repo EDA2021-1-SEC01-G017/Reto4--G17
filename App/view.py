@@ -41,8 +41,10 @@ operación solicitada
 #  Variables
 # ___________________________________________________
 
-#TODO
-servicefile = 'skylines.csv'
+
+airportfile = 'Skylines//airports_full.csv'
+routfile = 'Skylines//routes_full.csv'
+citiesfile = 'Skylines//worldcities.csv'
 initialStation = None
 
 
@@ -54,8 +56,8 @@ initialStation = None
 def printMenu():
     print("Bienvenido")
     print("1- Inicializar Analizador")
-    print("2- Cargar información de OVNIS")
-    print("3- REQ1-")
+    print("2- Cargar información de VUELOS")
+    print("3- REQ1- ")
     print("4- REQ2-")
     print("5- REQ3-")
     print("6- REQ4-")
@@ -75,11 +77,11 @@ while True:
     if int(inputs[0]) == 1:
         print("\nInicializando....")
         
-        archive = controller.init()
+        analyzer = controller.init()
 
     elif int(inputs[0]) == 2:
         print("\nCargando información de avistamientos....")
-        controller.loadData(archive, route) 
+        controller.loadData(analyzer, airportfile, routfile, citiesfile) 
     
     #EJEMPLO PARA ACOMODAR CADA REQ
     elif int(inputs[0]) == 3:
