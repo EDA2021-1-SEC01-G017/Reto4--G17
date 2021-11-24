@@ -84,17 +84,17 @@ while True:
         controller.loadData(analyzer, airportfile, routfile, citiesfile) 
     
     #EJEMPLO PARA ACOMODAR CADA REQ
-    elif int(inputs[0]) == 3:
+    #elif int(inputs[0]) == 3:
         #TITULO DEL REQ
-        print("\nREQ1-Buscando OVNIS en una ciudad: ")
+        #print("\nREQ1-Buscando OVNIS en una ciudad: ")
         #INPUTS REQUERIDOS
-        City = input("Ingrese la ciudad: ")
+        #City = input("Ingrese la ciudad: ")
         #USO DE FUNCIÓN
-        total = getOvnisInCity(archive, City)
+        #total = getOvnisInCity(archive, City)
         #IMPRESIÓN DE RESULTADOS
-        print(total)
-        print("Altura del arbol: " + str(om.height(archive['DateIndex'])))
-        print('Elementos en el arbol: ' + str(om.size(archive['DateIndex'])))
+        #print(total)
+        #print("Altura del arbol: " + str(om.height(archive['DateIndex'])))
+        #print('Elementos en el arbol: ' + str(om.size(archive['DateIndex'])))
 
     elif int(inputs[0]) == 4:
         pass

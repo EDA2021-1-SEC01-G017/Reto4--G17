@@ -61,6 +61,7 @@ def newAnalyzer():
                     'names': None,
                     'iatas': None,
                     'vuelos': None,
+                    'edgeTuples': None
                     }
 
         analyzer['names'] = m.newMap(numelements=20000,
@@ -68,7 +69,7 @@ def newAnalyzer():
                                      loadfactor=0.5,
                                      )
         
-        analyzer['iatas'] = m.newMap(numelements=20000,
+        analyzer['iataInfo'] = m.newMap(numelements=20000,
                                      maptype='PROBING',
                                      loadfactor=0.5,
                                      )
@@ -76,7 +77,11 @@ def newAnalyzer():
         analyzer['vuelos'] = gr.newGraph(datastructure='ADJ_LIST',
                                               directed=True,
                                               size=20000,
+                                              comparefunction=''
                                               )
+                                            
+        analyzer["edgeTuples"] = lt.newList()
+
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:newAnalyzer')
@@ -85,13 +90,38 @@ def newAnalyzer():
 # Funciones para agregar informacion al grafo
 
 def add_info (analyzer, airport):
-    m.put(analyzer["names"], airport["Name"], airport["IATA"])
+    m.put(analyzer["names"], airport["IATA"], airport["Name"])
+
     intlist0 = lt.newList()
+
     lt.addLast(intlist0, airport["City"])
     lt.addLast(intlist0, airport["Longitude"])
     lt.addLast(intlist0, airport["Latitude"])
-    m.put(analyzer["iatas"], airport["IATA"], intlist0)
+
+    m.put(analyzer["iataInfo"], airport["IATA"], intlist0)
+
     gr.insertVertex(analyzer["vuelos"], airport["IATA"])
+
+def add_edge (analyzer, route):
+
+    gr.addEdge(analyzer["vuelos"], route["Departure"], route["Destination"], eval(route["distance_km"]))
+
+    #tup = (route["Departure"], route["Destination"])
+
+    #lt.addLast(analyzer["edgeTuples"], tup)
+
+def double_dir (analyzer):
+    #Posible doble recorrido con tuplas locaslizadas en analyzer["edgeTuples"]
+    pass
+
+    
+
+
+
+
+    
+
+
     
 
 
@@ -107,6 +137,8 @@ def add_info (analyzer, airport):
 
 # ==============================
 # Funciones de Comparacion
+
+
 
 # ==============================
 
