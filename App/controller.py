@@ -49,9 +49,9 @@ def loadData(analyzer, airportfile, routefile, cityfile):
     """
     airportsfile = cf.data_dir + airportfile
 
-    routsfile = cf.data_dir + cityfile
+    routsfile = cf.data_dir + routefile
 
-    citiesfile = cf.data_dir + routefile
+    citiesfile = cf.data_dir + cityfile
 
     input_fileair = csv.DictReader(open(airportsfile, encoding="utf-8"),
                                 delimiter=",")
@@ -62,17 +62,19 @@ def loadData(analyzer, airportfile, routefile, cityfile):
     input_filecity = csv.DictReader(open(citiesfile, encoding="utf-8"),
                                 delimiter=",")
     
-    
+    #Funcional
     for airport in input_fileair:
         model.add_info(analyzer, airport)
-   
-    for route in input_filerout:
+
+
+    for route in input_filerout:  
+         
         model.add_edge(analyzer, route)
 
-    for city in input_filecity:
-        model.add_city(analyzer, city)
+    #for city in input_filecity:
+        #model.add_city(analyzer, city)
     
-    model.double_check(analyzer)
+    #model.double_check(analyzer)
 
     return analyzer
 

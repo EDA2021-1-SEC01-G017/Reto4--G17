@@ -128,7 +128,8 @@ def add_info (analyzer, airport):
 
 def add_edge (analyzer, route):
 
-    gr.addEdge(analyzer["vuelos"], route["Departure"], route["Destination"], eval(route["distance_km"]))
+    
+    gr.addEdge(analyzer["vuelos"], route["Departure"], route["Destination"], float(route["distance_km"]))
 
     pair = m.get(analyzer["routeMap"], route["Departure"])
     value = me.getValue(pair)
