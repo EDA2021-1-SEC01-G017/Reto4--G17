@@ -62,6 +62,7 @@ def newAnalyzer():
                     'iataInfo': None,
                     'distances': None,
                     'routeMap': None,
+                    'cityInfo': None,
                     'vuelos': None,
                     'doubleRoutes': None
                     }
@@ -82,9 +83,14 @@ def newAnalyzer():
                                      loadfactor = 0.5
                                      )
 
+        analyzer["cityInfo"] = m.newMap(numelements=20000,
+                                     maptype = 'PROBING',
+                                     loadfactor = 0.5
+                                     )
+
         analyzer['vuelos'] = gr.newGraph(datastructure='ADJ_LIST',
                                               directed=True,
-                                              size=20000,
+                                              size=2075,
                                               comparefunction=compareroutes
                                               )
                                      
@@ -93,6 +99,8 @@ def newAnalyzer():
                                               size=20000,
                                               comparefunction=compareroutes
                                               )
+        
+        
 
         return analyzer
     except Exception as exp:
@@ -107,6 +115,7 @@ def add_info (analyzer, airport):
 
     lt.addLast(intlist0, airport["Name"])
     lt.addLast(intlist0, airport["City"])
+    lt.addLast(intlist0, airport["Country"])
     lt.addLast(intlist0, airport["Longitude"])
     lt.addLast(intlist0, airport["Latitude"])
 
@@ -129,7 +138,16 @@ def add_edge (analyzer, route):
 
     joinKey = route["Departure"] + "-" + route["Destination"]
     m.put(analyzer["distances"], joinKey, route["distance_km"])
+    
 
+def add_city (analyzer, city):
+    joinKey = city["city_ascii"] + "-" + city["capital"]
+    infoList = lt.newList()
+    lt.addLast(infoList, city["population"])
+    lt.addLast(infoList, city["lat"])
+    lt.addLast(infoList, city["lng"])
+    m.put(analyzer["cityInfo"], joinKey, infoList)
+    
 def double_check(analyzer):
     iataList = m.keySet(analyzer["iataInfo"])
 
@@ -162,6 +180,7 @@ def double_check(analyzer):
 
                 lt.deleteElement(value1, pos_del1)
                 lt.deleteElement(value2, pos_del2)
+        
 
 
 

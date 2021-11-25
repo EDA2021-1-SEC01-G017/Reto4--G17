@@ -26,6 +26,9 @@ import sys
 import threading
 import controller
 from DISClib.ADT import list as lt
+from DISClib.ADT.graph import gr
+from DISClib.ADT import map as m
+from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import stack
 assert cf
 
@@ -66,7 +69,7 @@ def printMenu():
     print("0- Salir")
     print("*******************************************")
 
-catalog = None
+analyzer = None
 
 """
 Menu principal
@@ -82,6 +85,34 @@ while True:
     elif int(inputs[0]) == 2:
         print("\nCargando información de avistamientos....")
         controller.loadData(analyzer, airportfile, routefile, citiesfile) 
+        print("En el primer grafo hay un total de " + str(gr.numVertices[analyzer["vuelos"]]) + "aeropuertos.")
+        print("En el segundo grafo hay un total de " + str(gr.numVertices[analyzer["doubleRoutes"]]) + " aeropuertos.")
+        print("Existen " + str(m.size(analyzer["cityInfo"])) + " ciudades en el archivo.")
+        lista_iatas = m.keySet(analyzer["iataInfo"])
+        primer_iata = lt.firstElement(lista_iatas)
+        pareja_ini = m.get(analyzer["iataInfo"], primer_iata)
+        info_list = me.getValue(pareja_ini)
+        first_ap_str = ""
+        for elemento in lt.iterator(info_list):
+            first_ap_str += elemento
+            first_ap_str += ", "
+        
+        print("La información del primer aeropuerto cargado es: " + first_ap_str)
+
+        lista_ciudades = m.keySet(analyzer["cityInfo"])
+        ultima_ciudad = lt.lastElement(lista_ciudades)
+        pareja_ini2 = m.get(analyzer["cityInfo"], ultima_ciudad)
+        info_list2 = me.getValue(pareja_ini2)
+        final_city_str = ""
+        for elemento2 in lt.iterator(info_list2):
+            final_city_str += elemento2
+            final_city_str += ", "
+
+        print("La información de la última ciudad cargada primer aeropuerto cargado es: " + final_city_str)
+
+        
+    
+
     
     #EJEMPLO PARA ACOMODAR CADA REQ
     #elif int(inputs[0]) == 3:

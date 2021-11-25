@@ -23,7 +23,7 @@
 import config as cf
 import model
 import csv
-from DISClib.ADT.graph import gr
+from DISClib.ADT.graph import gr, vertices
 
 
 """
@@ -62,16 +62,17 @@ def loadData(analyzer, airportfile, routefile, cityfile):
     input_filecity = csv.DictReader(open(citiesfile, encoding="utf-8"),
                                 delimiter=",")
     
+    
     for airport in input_fileair:
         model.add_info(analyzer, airport)
-        
-
-
+   
     for route in input_filerout:
         model.add_edge(analyzer, route)
 
-    #for city in input_filecity:
-    #    model.add_info(analyzer, city)
+    for city in input_filecity:
+        model.add_city(analyzer, city)
+    
+    model.double_check(analyzer)
 
     return analyzer
 
