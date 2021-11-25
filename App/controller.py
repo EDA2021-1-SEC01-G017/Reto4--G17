@@ -24,6 +24,7 @@ import config as cf
 import model
 import csv
 from DISClib.ADT.graph import gr, vertices
+from DISClib.ADT import list as lt
 
 
 """
@@ -70,7 +71,11 @@ def loadData(analyzer, airportfile, routefile, cityfile):
     for route in input_filerout:  
          
         model.add_edge(analyzer, route)
-
+        
+    if lt.isPresent(analyzer["existCheck"], False) != 0:
+        print("Hay un None")
+    else:
+        print("No hay Nones")
     #for city in input_filecity:
         #model.add_city(analyzer, city)
     

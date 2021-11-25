@@ -25,6 +25,7 @@
  """
 
 
+
 import config 
 
 from DISClib.ADT.graph import gr
@@ -64,7 +65,8 @@ def newAnalyzer():
                     'routeMap': None,
                     'cityInfo': None,
                     'vuelos': None,
-                    'doubleRoutes': None
+                    'doubleRoutes': None,
+                    'existCheck': None
                     }
         
         
@@ -100,6 +102,8 @@ def newAnalyzer():
                                               comparefunction=compareroutes
                                               )
         
+        analyzer["existCheck"] = lt.newList(datastructure="SINGLE_LINKED")
+        
         
 
         return analyzer
@@ -127,18 +131,29 @@ def add_info (analyzer, airport):
     gr.insertVertex(analyzer["vuelos"], airport["IATA"])
 
 def add_edge (analyzer, route):
+    NoneType = type(None)
 
+    b1= route["Departure"]
+    b2= route["Destination"]
+    b3= route["distance_km"]
+
+
+    c = True
+    if  type(b1) == NoneType or  type(b2) == NoneType or type(b3) == NoneType:
+        c = False
     
-    gr.addEdge(analyzer["vuelos"], route["Departure"], route["Destination"], float(route["distance_km"]))
+    lt.addLast(analyzer["existCheck"], c)
 
-    pair = m.get(analyzer["routeMap"], route["Departure"])
-    value = me.getValue(pair)
+    gr.addEdge(analyzer["vuelos"], b1, b2, float(b3))
 
-    if lt.isPresent(value, route["Destination"]) == 0:
-        lt.addLast(value, route["Destination"])
+    #pair = m.get(analyzer["routeMap"], route["Departure"])
+    #value = me.getValue(pair)
 
-    joinKey = route["Departure"] + "-" + route["Destination"]
-    m.put(analyzer["distances"], joinKey, route["distance_km"])
+    #if lt.isPresent(value, route["Destination"]) == 0:
+    #    lt.addLast(value, route["Destination"])
+
+    #joinKey = route["Departure"] + "-" + route["Destination"]
+    #m.put(analyzer["distances"], joinKey, route["distance_km"])
     
 
 def add_city (analyzer, city):
