@@ -29,6 +29,7 @@ import config
 
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
+from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import list as lt
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
@@ -58,29 +59,40 @@ def newAnalyzer():
     """
     try:
         analyzer = {
-                    'names': None,
-                    'iatas': None,
+                    'iataInfo': None,
+                    'distances': None,
+                    'routeMap': None,
                     'vuelos': None,
-                    'edgeTuples': None
+                    'doubleRoutes': None
                     }
-
-        analyzer['names'] = m.newMap(numelements=20000,
-                                     maptype='PROBING',
-                                     loadfactor=0.5,
-                                     )
+        
         
         analyzer['iataInfo'] = m.newMap(numelements=20000,
                                      maptype='PROBING',
-                                     loadfactor=0.5,
+                                     loadfactor=0.5
+                                     )
+
+        analyzer['distances'] = m.newMap(numelements=20000,
+                                     maptype='PROBING',
+                                     loadfactor=0.5
+                                     )
+        
+        analyzer['routeMap'] = m.newMap(numelements=20000,
+                                     maptype = 'PROBING',
+                                     loadfactor = 0.5
                                      )
 
         analyzer['vuelos'] = gr.newGraph(datastructure='ADJ_LIST',
                                               directed=True,
                                               size=20000,
-                                              comparefunction=''
+                                              comparefunction=compareroutes
                                               )
-                                            
-        analyzer["edgeTuples"] = lt.newList()
+                                     
+        analyzer["doubleRoutes"] = gr.newGraph(datastructure='ADJ_LIST',
+                                              directed=True,
+                                              size=20000,
+                                              comparefunction=compareroutes
+                                              )
 
         return analyzer
     except Exception as exp:
@@ -90,15 +102,18 @@ def newAnalyzer():
 # Funciones para agregar informacion al grafo
 
 def add_info (analyzer, airport):
-    m.put(analyzer["names"], airport["IATA"], airport["Name"])
 
     intlist0 = lt.newList()
 
+    lt.addLast(intlist0, airport["Name"])
     lt.addLast(intlist0, airport["City"])
     lt.addLast(intlist0, airport["Longitude"])
     lt.addLast(intlist0, airport["Latitude"])
 
     m.put(analyzer["iataInfo"], airport["IATA"], intlist0)
+
+    intlist1 = lt.newList()
+    m.put(analyzer["routeMap"], airport["IATA"], intlist1)
 
     gr.insertVertex(analyzer["vuelos"], airport["IATA"])
 
@@ -106,13 +121,51 @@ def add_edge (analyzer, route):
 
     gr.addEdge(analyzer["vuelos"], route["Departure"], route["Destination"], eval(route["distance_km"]))
 
-    #tup = (route["Departure"], route["Destination"])
+    pair = m.get(analyzer["routeMap"], route["Departure"])
+    value = me.getValue(pair)
 
-    #lt.addLast(analyzer["edgeTuples"], tup)
+    if lt.isPresent(value, route["Destination"]) == 0:
+        lt.addLast(value, route["Destination"])
 
-def double_dir (analyzer):
-    #Posible doble recorrido con tuplas locaslizadas en analyzer["edgeTuples"]
-    pass
+    joinKey = route["Departure"] + "-" + route["Destination"]
+    m.put(analyzer["distances"], joinKey, route["distance_km"])
+
+def double_check(analyzer):
+    iataList = m.keySet(analyzer["iataInfo"])
+
+    for dep in lt.iterator(iataList):
+
+        pair1 = m.get(analyzer["routeMap"], dep)
+
+        value1 = me.getValue(pair1)
+
+        for des in lt.iterator(value1): 
+
+            pair2 = m.get(analyzer["routeMap"], des)
+
+            value2 = me.getValue(pair2)
+
+            if lt.isPresent(value2, dep) != 0:
+                if gr.containsVertex(analyzer["doubleRoutes"], dep) == False:
+                    gr.insertVertex(analyzer["doubleRoutes"], dep)
+                if gr.containsVertex(analyzer["doubleRoutes"], des) == False:
+                    gr.insertVertex(analyzer["doubleRoutes"], des)
+
+                join_key = dep + "-" + des
+                distance_pair = m.get(analyzer["distances"], join_key)
+                distance_val = me.getValue(distance_pair)
+
+                gr.addEdge(analyzer["doubleRoutes"], dep, des, distance_val)
+
+                pos_del1 = lt.isPresent(value1, des)
+                pos_del2 = lt.isPresent(value2, dep)
+
+                lt.deleteElement(value1, pos_del1)
+                lt.deleteElement(value2, pos_del2)
+
+
+
+
 
     
 
@@ -138,7 +191,14 @@ def double_dir (analyzer):
 # ==============================
 # Funciones de Comparacion
 
-
+def compareroutes(route1, route2):
+    """
+    Compara dos rutas
+    """
+    if (route1 == route2):
+        return 0
+    else:
+        return 1
 
 # ==============================
 

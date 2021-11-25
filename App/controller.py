@@ -23,6 +23,7 @@
 import config as cf
 import model
 import csv
+from DISClib.ADT.graph import gr
 
 
 """
@@ -42,7 +43,7 @@ def init():
     return analyzer
 # Funciones para la carga de datos
 
-def loadData(analyzer, airportfile, routfile, cityfile):
+def loadData(analyzer, airportfile, routefile, cityfile):
     """
     Carga los datos de los archivos CSV en el modelo
     """
@@ -50,7 +51,7 @@ def loadData(analyzer, airportfile, routfile, cityfile):
 
     routsfile = cf.data_dir + cityfile
 
-    citiesfile = cf.data_dir + routfile
+    citiesfile = cf.data_dir + routefile
 
     input_fileair = csv.DictReader(open(airportsfile, encoding="utf-8"),
                                 delimiter=",")
@@ -63,9 +64,11 @@ def loadData(analyzer, airportfile, routfile, cityfile):
     
     for airport in input_fileair:
         model.add_info(analyzer, airport)
+        
 
-    for rout in input_filerout:
-        model.add_edge(analyzer, rout)
+
+    for route in input_filerout:
+        model.add_edge(analyzer, route)
 
     #for city in input_filecity:
     #    model.add_info(analyzer, city)

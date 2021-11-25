@@ -43,7 +43,7 @@ operación solicitada
 
 
 airportfile = 'Skylines//airports_full.csv'
-routfile = 'Skylines//routes_full.csv'
+routefile = 'Skylines//routes_full.csv'
 citiesfile = 'Skylines//worldcities.csv'
 initialStation = None
 
@@ -81,7 +81,7 @@ while True:
 
     elif int(inputs[0]) == 2:
         print("\nCargando información de avistamientos....")
-        controller.loadData(analyzer, airportfile, routfile, citiesfile) 
+        controller.loadData(analyzer, airportfile, routefile, citiesfile) 
     
     #EJEMPLO PARA ACOMODAR CADA REQ
     #elif int(inputs[0]) == 3:
