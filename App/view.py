@@ -50,10 +50,40 @@ routefile = 'Skylines//routes_full.csv'
 citiesfile = 'Skylines//worldcities.csv'
 initialStation = None
 
+# ___________________________________________________
+#  Funciones
+# ___________________________________________________
+
+def interconection(analyzer):
+    answer = controller.interconection(analyzer)
+    org = sorted(answer, key=lambda x:x[4])
+    
+    
+    print()
+
+def clusteres (analyzer, iataAp1, iataAp2):
+    answer = controller.clusteres(analyzer, iataAp1, iataAp2)
+
+def shortestRoute (analyzer, origin, destiny):
+    answer = controller.shortestRoute(analyzer, origin, destiny)
+
+def travelerMiles (analyzer, origin, miles):
+    answer = controller.travelerMiles(analyzer, origin, miles)
+
+def closedEffect (analyzer, closedIata):
+    answer = controller.closedEffect(analyzer, closedIata)
+
+def compareWeb (analyzer, origin, destiny):
+    answer = controller.compareWeb(analyzer, origin, destiny)
+
+def graphVis ():
+    answer = controller.graphVis()
+
 
 # ___________________________________________________
 #  Menu principal
 # ___________________________________________________
+
 
 
 def printMenu():
@@ -88,6 +118,7 @@ while True:
         print("En el primer grafo hay un total de " + str(gr.numVertices[analyzer["vuelos"]]) + "aeropuertos.")
         print("En el segundo grafo hay un total de " + str(gr.numVertices[analyzer["doubleRoutes"]]) + " aeropuertos.")
         print("Existen " + str(m.size(analyzer["cityInfo"])) + " ciudades en el archivo.")
+        
         lista_iatas = m.keySet(analyzer["iataInfo"])
         primer_iata = lt.firstElement(lista_iatas)
         pareja_ini = m.get(analyzer["iataInfo"], primer_iata)
@@ -108,27 +139,38 @@ while True:
             final_city_str += elemento2
             final_city_str += ", "
 
-        print("La información de la última ciudad cargada primer aeropuerto cargado es: " + final_city_str)
+        print("La información de la última ciudad cargada es: " + final_city_str)
+
+    elif int(inputs[0]) == 3:
+        print(interconection(analyzer))
+           
+    elif int(inputs[0]) == 4:
+        iataAp1 = input("Ingrese el IATA del primer aeropuerto: ").upper()
+        iataAp2 = input("Ingrese el IATA del segundo aeropuerto: ").upper()
+        print(clusteres(analyzer, iataAp1, iataAp2))
 
         
-    
+    elif int(inputs[0]) == 5:
+        origin = input("Ingrese el nombre de la ciudad de origen: ").upper()
+        destiny = input("Ingrese el nombre de la ciudad de destino: ").upper()
+        print(shortestRoute(analyzer, origin, destiny))        
 
-    
-    #EJEMPLO PARA ACOMODAR CADA REQ
-    #elif int(inputs[0]) == 3:
-        #TITULO DEL REQ
-        #print("\nREQ1-Buscando OVNIS en una ciudad: ")
-        #INPUTS REQUERIDOS
-        #City = input("Ingrese la ciudad: ")
-        #USO DE FUNCIÓN
-        #total = getOvnisInCity(archive, City)
-        #IMPRESIÓN DE RESULTADOS
-        #print(total)
-        #print("Altura del arbol: " + str(om.height(archive['DateIndex'])))
-        #print('Elementos en el arbol: ' + str(om.size(archive['DateIndex'])))
+    elif int(inputs[0]) == 6:
+        origin = input("Ingrese el nombre de la ciudad de origen: ").upper()
+        miles = int(input("Ingrese el numero de millas que el pasajero posee: "))
+        print(travelerMiles(analyzer, origin, miles))
 
-    elif int(inputs[0]) == 4:
-        pass
+    elif int(inputs[0]) == 7:
+        closedIata = input("Ingrese el IATA del aeropuerto que esta fuera de funcionamiento: ")
+        print(closedEffect(analyzer, closedIata))
+
+    elif int(inputs[0]) == 8:
+        origin = input("Ingrese el nombre de la ciudad de origen: ").upper()
+        destiny = input("Ingrese el nombre de la ciudad de destino: ").upper()
+        print(compareWeb(analyzer, origin, destiny))
+
+    elif int(inputs[0]) == 9:
+        print(graphVis())
 
     else:
         sys.exit(0)

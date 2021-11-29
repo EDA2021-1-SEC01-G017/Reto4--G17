@@ -117,11 +117,11 @@ def add_info (analyzer, airport):
 
     intlist0 = lt.newList()
 
-    lt.addLast(intlist0, airport["Name"])
-    lt.addLast(intlist0, airport["City"])
-    lt.addLast(intlist0, airport["Country"])
-    lt.addLast(intlist0, airport["Longitude"])
-    lt.addLast(intlist0, airport["Latitude"])
+    lt.addLast(intlist0, airport["Name"].upper())
+    lt.addLast(intlist0, airport["City"].upper())
+    lt.addLast(intlist0, airport["Country"].upper())
+    lt.addLast(intlist0, float(airport["Longitude"]))
+    lt.addLast(intlist0, float(airport["Latitude"]))
 
     m.put(analyzer["iataInfo"], airport["IATA"], intlist0)
 
@@ -133,9 +133,9 @@ def add_info (analyzer, airport):
 def add_edge (analyzer, route):
     NoneType = type(None)
 
-    b1= route["Departure"]
-    b2= route["Destination"]
-    b3= route["distance_km"]
+    b1= route["Departure"].upper()
+    b2= route["Destination"].upper()
+    b3= float(route["distance_km"])
 
 
     c = True
@@ -144,7 +144,7 @@ def add_edge (analyzer, route):
     
     lt.addLast(analyzer["existCheck"], c)
 
-    gr.addEdge(analyzer["vuelos"], b1, b2, float(b3))
+    gr.addEdge(analyzer["vuelos"], b1, b2, b3)
 
     #pair = m.get(analyzer["routeMap"], route["Departure"])
     #value = me.getValue(pair)
@@ -159,9 +159,9 @@ def add_edge (analyzer, route):
 def add_city (analyzer, city):
     joinKey = city["city_ascii"] + "-" + city["capital"]
     infoList = lt.newList()
-    lt.addLast(infoList, city["population"])
-    lt.addLast(infoList, city["lat"])
-    lt.addLast(infoList, city["lng"])
+    lt.addLast(infoList, int(city["population"]))
+    lt.addLast(infoList, float(city["lat"]))
+    lt.addLast(infoList, float(city["lng"]))
     m.put(analyzer["cityInfo"], joinKey, infoList)
     
 def double_check(analyzer):
@@ -196,6 +196,45 @@ def double_check(analyzer):
 
                 lt.deleteElement(value1, pos_del1)
                 lt.deleteElement(value2, pos_del2)
+    
+def interconection (analyzer):
+    iataList = m.keySet(analyzer["iataInfo"])
+    table = []
+    for iata in lt.iterator(iataList):
+        numVertex = gr.adjacents(analyzer["vuelos"], iata)
+        line = []
+        path = m.get(analyzer["iataInfo"], iata)
+        values = me.getValue(path)
+        nombre = lt.getElement(values, 1)
+        ciudad = lt.getElement(values, 2)
+        pais = lt.getElement(values, 3)
+        line.append(iata) 
+        line.append(nombre) 
+        line.append(ciudad) 
+        line.append(pais)
+        line.append(str(numVertex))
+        table.append(line)
+    return table
+
+def clusteres (analyzer, iataAp1, iataAp2):
+    
+    pass
+
+def shortestRoute (analyzer, origin, destiny):
+    pass
+
+def travelerMiles (analyzer, origin, miles):
+    pass
+
+def closedEffect (analyzer, closedIata):
+    pass
+
+def compareWeb (analyzer, origin, destiny):
+    pass
+
+def graphVis ():
+    pass
+
         
 
 

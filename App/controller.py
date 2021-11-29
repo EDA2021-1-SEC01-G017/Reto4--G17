@@ -76,13 +76,13 @@ def loadData(analyzer, airportfile, routefile, cityfile):
         print("Hay un None")
     else:
         print("No hay Nones")
+        
     #for city in input_filecity:
         #model.add_city(analyzer, city)
     
     #model.double_check(analyzer)
 
     return analyzer
-
 
 
 # ___________________________________________________
@@ -92,4 +92,28 @@ def loadData(analyzer, airportfile, routefile, cityfile):
 
 # Funciones de ordenamiento
 
+
+
 # Funciones de consulta sobre el catálogo
+
+def interconection (analyzer):
+    return model.interconection(analyzer)
+
+def clusteres (analyzer, iataAp1, iataAp2):
+    return model.clusteres(analyzer, iataAp1, iataAp2)
+
+def shortestRoute (analyzer, origin, destiny):
+    return model.shortestRoute(analyzer, origin, destiny)
+
+def travelerMiles (analyzer, origin, miles):
+    return model.travelerMiles(analyzer, origin, miles)
+
+def closedEffect (analyzer, closedIata):
+    return model.closedEffect(analyzer, closedIata)
+
+def compareWeb (analyzer, origin, destiny):
+    return model.compareWeb(analyzer, origin, destiny)
+
+def graphVis ():
+    return model.graphVis()
+
