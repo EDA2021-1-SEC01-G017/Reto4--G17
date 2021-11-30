@@ -97,7 +97,7 @@ def newAnalyzer():
                                               )
                                      
         analyzer["doubleRoutes"] = gr.newGraph(datastructure='ADJ_LIST',
-                                              directed=True,
+                                              directed=False,
                                               size=20000,
                                               comparefunction=compareroutes
                                               )
@@ -139,14 +139,8 @@ def add_edge (analyzer, route):
     b1= route["Departure"]
     b2= route["Destination"]
     b3= float(route["distance_km"])
-
-    lista=[]
-    lista.append(b1)
-    lista.append(b2)
-    lista.append(b3)
-    print(lista)
-
-    #gr.addEdge(analyzer["vuelos"], b1, b2, b3)
+    
+    gr.addEdge(analyzer["vuelos"], b1, b2, b3)
 
     #pair = m.get(analyzer["routeMap"], route["Departure"])
     #value = me.getValue(pair)

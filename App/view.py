@@ -113,7 +113,7 @@ while True:
         analyzer = controller.init()
 
     elif int(inputs[0]) == 2:
-        print("\nCargando información de avistamientos....")
+        print("\nCargando información de vuelos....")
         controller.loadData(analyzer, airportfile, routefile, citiesfile) 
         print("En el primer grafo hay un total de " + str(gr.numVertices[analyzer["vuelos"]]) + "aeropuertos.")
         print("En el segundo grafo hay un total de " + str(gr.numVertices[analyzer["doubleRoutes"]]) + " aeropuertos.")
