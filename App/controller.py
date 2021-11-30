@@ -25,6 +25,7 @@ import model
 import csv
 from DISClib.ADT.graph import gr, vertices
 from DISClib.ADT import list as lt
+from DISClib.ADT import map as m
 
 
 """
@@ -39,10 +40,12 @@ def init():
     """
     Llama la funcion de inicializacion  del modelo.
     """
-    # catalog es utilizado para interactuar con el modelo
+    
     analyzer = model.newAnalyzer()
     return analyzer
 # Funciones para la carga de datos
+
+analyzer = init()
 
 def loadData(analyzer, airportfile, routefile, cityfile):
     """
@@ -64,18 +67,18 @@ def loadData(analyzer, airportfile, routefile, cityfile):
                                 delimiter=",")
     
     #Funcional
+   
     for airport in input_fileair:
-        model.add_info(analyzer, airport)
-
-
-    for route in input_filerout:  
-         
-        model.add_edge(analyzer, route)
         
-    if lt.isPresent(analyzer["existCheck"], False) != 0:
-        print("Hay un None")
-    else:
-        print("No hay Nones")
+        model.add_info(analyzer, airport)
+        
+    
+    
+    i=0
+    for route in input_filerout:  
+        i+=1
+        print(i)
+        #model.add_edge(analyzer, route)
         
     #for city in input_filecity:
         #model.add_city(analyzer, city)

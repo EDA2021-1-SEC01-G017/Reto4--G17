@@ -99,7 +99,7 @@ def printMenu():
     print("0- Salir")
     print("*******************************************")
 
-analyzer = None
+
 
 """
 Menu principal

@@ -90,9 +90,9 @@ def newAnalyzer():
                                      loadfactor = 0.5
                                      )
 
-        analyzer['vuelos'] = gr.newGraph(datastructure='ADJ_LIST',
+        analyzer["vuelos"] = gr.newGraph(datastructure='ADJ_LIST',
                                               directed=True,
-                                              size=2075,
+                                              size=20000,
                                               comparefunction=compareroutes
                                               )
                                      
@@ -102,7 +102,7 @@ def newAnalyzer():
                                               comparefunction=compareroutes
                                               )
         
-        analyzer["existCheck"] = lt.newList(datastructure="SINGLE_LINKED")
+        
         
         
 
@@ -115,6 +115,7 @@ def newAnalyzer():
 
 def add_info (analyzer, airport):
 
+    
     intlist0 = lt.newList()
 
     lt.addLast(intlist0, airport["Name"].upper())
@@ -123,28 +124,29 @@ def add_info (analyzer, airport):
     lt.addLast(intlist0, float(airport["Longitude"]))
     lt.addLast(intlist0, float(airport["Latitude"]))
 
+    
     m.put(analyzer["iataInfo"], airport["IATA"], intlist0)
+
 
     intlist1 = lt.newList()
     m.put(analyzer["routeMap"], airport["IATA"], intlist1)
 
     gr.insertVertex(analyzer["vuelos"], airport["IATA"])
 
-def add_edge (analyzer, route):
-    NoneType = type(None)
 
-    b1= route["Departure"].upper()
-    b2= route["Destination"].upper()
+def add_edge (analyzer, route):
+    
+    b1= route["Departure"]
+    b2= route["Destination"]
     b3= float(route["distance_km"])
 
+    lista=[]
+    lista.append(b1)
+    lista.append(b2)
+    lista.append(b3)
+    print(lista)
 
-    c = True
-    if  type(b1) == NoneType or  type(b2) == NoneType or type(b3) == NoneType:
-        c = False
-    
-    lt.addLast(analyzer["existCheck"], c)
-
-    gr.addEdge(analyzer["vuelos"], b1, b2, b3)
+    #gr.addEdge(analyzer["vuelos"], b1, b2, b3)
 
     #pair = m.get(analyzer["routeMap"], route["Departure"])
     #value = me.getValue(pair)
