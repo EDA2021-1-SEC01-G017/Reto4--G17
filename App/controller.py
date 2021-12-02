@@ -59,31 +59,20 @@ def loadData(analyzer, airportfile, routefile, cityfile):
 
     input_fileair = csv.DictReader(open(airportsfile, encoding="utf-8"),
                                 delimiter=",")
-    
     input_filerout = csv.DictReader(open(routsfile, encoding="utf-8"),
                                 delimiter=",")
-
     input_filecity = csv.DictReader(open(citiesfile, encoding="utf-8"),
                                 delimiter=",")
     
     #Funcional
-   
-    for airport in input_fileair:
-        
+    for airport in input_fileair:  
         model.add_info(analyzer, airport)
 
-    
-     
-
-    
     for route in input_filerout:  
-        
         model.add_edge(analyzer, route)
     
-    
-        
-    #for city in input_filecity:
-        #model.add_city(analyzer, city)
+    for city in input_filecity:
+        model.add_city(analyzer, city)
     
     #model.double_check(analyzer)
 
@@ -121,4 +110,7 @@ def compareWeb (analyzer, origin, destiny):
 
 def graphVis ():
     return model.graphVis()
+
+def chooseCity (analyzer, city):
+    return model.chooseCity(analyzer, city)
 

@@ -69,43 +69,33 @@ def newAnalyzer():
                     'existCheck': None
                     }
         
-        
         analyzer['iataInfo'] = m.newMap(numelements=20000,
                                      maptype='PROBING',
                                      loadfactor=0.5
                                      )
-
         analyzer['distances'] = m.newMap(numelements=20000,
                                      maptype='PROBING',
                                      loadfactor=0.5
                                      )
-        
         analyzer['routeMap'] = m.newMap(numelements=20000,
                                      maptype = 'PROBING',
                                      loadfactor = 0.5
                                      )
-
         analyzer["cityInfo"] = m.newMap(numelements=20000,
                                      maptype = 'PROBING',
                                      loadfactor = 0.5
                                      )
-
         analyzer["vuelos"] = gr.newGraph(datastructure='ADJ_LIST',
                                               directed=True,
                                               size=20000,
                                               comparefunction=compareroutes
-                                              )
-                                     
+                                              )                              
         analyzer["doubleRoutes"] = gr.newGraph(datastructure='ADJ_LIST',
                                               directed=False,
                                               size=20000,
                                               comparefunction=compareroutes
                                               )
         
-        
-        
-        
-
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:newAnalyzer')
@@ -114,32 +104,22 @@ def newAnalyzer():
 # Funciones para agregar informacion al grafo
 
 def add_info (analyzer, airport):
-
-    
     intlist0 = lt.newList()
-
     lt.addLast(intlist0, airport["Name"].upper())
     lt.addLast(intlist0, airport["City"].upper())
     lt.addLast(intlist0, airport["Country"].upper())
     lt.addLast(intlist0, float(airport["Longitude"]))
     lt.addLast(intlist0, float(airport["Latitude"]))
-
-    
     m.put(analyzer["iataInfo"], airport["IATA"], intlist0)
-
-
     intlist1 = lt.newList()
     m.put(analyzer["routeMap"], airport["IATA"], intlist1)
-
     gr.insertVertex(analyzer["vuelos"], airport["IATA"])
 
 
 def add_edge (analyzer, route):
-    
     b1= route["Departure"]
     b2= route["Destination"]
     b3= float(route["distance_km"])
-    
     gr.addEdge(analyzer["vuelos"], b1, b2, b3)
 
     #pair = m.get(analyzer["routeMap"], route["Departure"])
@@ -153,43 +133,34 @@ def add_edge (analyzer, route):
     
 
 def add_city (analyzer, city):
-    joinKey = city["city_ascii"] + "-" + city["capital"]
+    joinKey = city["city_ascii"].upper() + "-" + city["id"] 
     infoList = lt.newList()
-    lt.addLast(infoList, int(city["population"]))
-    lt.addLast(infoList, float(city["lat"]))
-    lt.addLast(infoList, float(city["lng"]))
+    lt.addLast(infoList, city["country"].upper())
+    lt.addLast(infoList, city["population"].upper())
+    lt.addLast(infoList, city["lat"])
+    lt.addLast(infoList, city["lng"])
+    lt.addLast(infoList, city["id"])
     m.put(analyzer["cityInfo"], joinKey, infoList)
     
 def double_check(analyzer):
     iataList = m.keySet(analyzer["iataInfo"])
-
     for dep in lt.iterator(iataList):
-
         pair1 = m.get(analyzer["routeMap"], dep)
-
         value1 = me.getValue(pair1)
-
         for des in lt.iterator(value1): 
-
             pair2 = m.get(analyzer["routeMap"], des)
-
             value2 = me.getValue(pair2)
-
             if lt.isPresent(value2, dep) != 0:
                 if gr.containsVertex(analyzer["doubleRoutes"], dep) == False:
                     gr.insertVertex(analyzer["doubleRoutes"], dep)
                 if gr.containsVertex(analyzer["doubleRoutes"], des) == False:
                     gr.insertVertex(analyzer["doubleRoutes"], des)
-
                 join_key = dep + "-" + des
                 distance_pair = m.get(analyzer["distances"], join_key)
                 distance_val = me.getValue(distance_pair)
-
                 gr.addEdge(analyzer["doubleRoutes"], dep, des, distance_val)
-
                 pos_del1 = lt.isPresent(value1, des)
                 pos_del2 = lt.isPresent(value2, dep)
-
                 lt.deleteElement(value1, pos_del1)
                 lt.deleteElement(value2, pos_del2)
     
@@ -197,7 +168,10 @@ def interconection (analyzer):
     iataList = m.keySet(analyzer["iataInfo"])
     table = []
     for iata in lt.iterator(iataList):
-        numVertex = gr.adjacents(analyzer["vuelos"], iata)
+        vertexList = gr.adjacents(analyzer["vuelos"], iata)
+        inNumb = gr.indegree(analyzer["vuelos"], iata)
+        outNumb = gr.outdegree(analyzer["vuelos"], iata)
+        numVertex = lt.size(vertexList)
         line = []
         path = m.get(analyzer["iataInfo"], iata)
         values = me.getValue(path)
@@ -209,8 +183,10 @@ def interconection (analyzer):
         line.append(ciudad) 
         line.append(pais)
         line.append(str(numVertex))
+        line.append(inNumb)
+        line.append(outNumb)
         table.append(line)
-    return table
+    return table                                      
 
 def clusteres (analyzer, iataAp1, iataAp2):
     
@@ -232,6 +208,32 @@ def graphVis ():
     pass
 
         
+def chooseCity (analyzer, city):
+    llaves = m.keySet(analyzer["cityInfo"])
+    table = []
+    for key in lt.iterator(llaves):
+        line = []
+        ind = len(table) + 1
+        chainList = key.split("-")
+        nombre = chainList[0]
+        if nombre == city:
+            path = m.get(analyzer["cityInfo"], key)
+            valList = me.getValue(path)
+            line.append(ind)
+            line.append(nombre)
+            for val in lt.iterator(valList):
+                line.append(val)
+            table.append(line)
+    
+    return table
+    
+
+            
+
+            
+            
+
+
 
 
 

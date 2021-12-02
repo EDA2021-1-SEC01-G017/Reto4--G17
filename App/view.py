@@ -30,6 +30,7 @@ from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import stack
+from tabulate import tabulate
 assert cf
 
 
@@ -56,16 +57,28 @@ initialStation = None
 
 def interconection(analyzer):
     answer = controller.interconection(analyzer)
-    org = sorted(answer, key=lambda x:x[4])
-    
-    
-    print()
-
+    org = sorted(answer, key=lambda x:x[4], reverse=True)
+    table5 = org[:5]
+    headliners = ["Name", "City", "Country", "IATA", "connections", "inbound", "outbound"]
+    print("Connected airports inside network: " + str(len(org)) + "\n")
+    print("TOP 5 most connected airports..." + "\n")
+    print(tabulate(table5, headers=headliners, tablefmt="pretty") + "\n")
+     
 def clusteres (analyzer, iataAp1, iataAp2):
     answer = controller.clusteres(analyzer, iataAp1, iataAp2)
+    number = answer[0]
+    chain = answer[1]
+    if chain == False:
+        cond = " not "
+    else:
+        cond = ""
+    print("The total number of clusters present in the network is: " + number)
+    print("The two airports identified with the IATAS: " + iataAp1 + " & " + iataAp2 + " are " + cond + " located on the same cluster." + "\n")
 
 def shortestRoute (analyzer, origin, destiny):
     answer = controller.shortestRoute(analyzer, origin, destiny)
+
+
 
 def travelerMiles (analyzer, origin, miles):
     answer = controller.travelerMiles(analyzer, origin, miles)
@@ -79,12 +92,19 @@ def compareWeb (analyzer, origin, destiny):
 def graphVis ():
     answer = controller.graphVis()
 
+def chooseCity (analyzer, city):
+    answer = controller.chooseCity(analyzer, city)
+    correctLine = 0
+    headliners = ["Option Number", "city", "country", "population", "lat", "lng", "id"] 
+    if len(answer) > 1:
+        print(tabulate(answer, headers=headliners, tablefmt="pretty") + "\n")
+        correctLine = int(input("Type the option number of the city you would like to choose: "))-1
+    chosenCity = answer[correctLine][1] + "-" + str(answer[correctLine][-1])
+    return chosenCity
 
 # ___________________________________________________
 #  Menu principal
 # ___________________________________________________
-
-
 
 def printMenu():
     print("Bienvenido")
@@ -113,61 +133,102 @@ while True:
         analyzer = controller.init()
 
     elif int(inputs[0]) == 2:
-        print("\nCargando información de vuelos....")
+        print("\nLoading flies routes....")
         controller.loadData(analyzer, airportfile, routefile, citiesfile) 
-        print("En el primer grafo hay un total de " + str(gr.numVertices[analyzer["vuelos"]]) + "aeropuertos.")
-        print("En el segundo grafo hay un total de " + str(gr.numVertices[analyzer["doubleRoutes"]]) + " aeropuertos.")
-        print("Existen " + str(m.size(analyzer["cityInfo"])) + " ciudades en el archivo.")
+
+        #First Table
+        num1 = gr.numVertices(analyzer["vuelos"])
+        num2 = gr.numEdges(analyzer["vuelos"])
+
+        print("=== Airports-Routes DiGraph ===")
+        print("Nodes: " + str(num1))
+        print("Edges: " + str(num2))
+        print("First & Last Airport loaded in the Digraph." + "\n")
         
         lista_iatas = m.keySet(analyzer["iataInfo"])
         primer_iata = lt.firstElement(lista_iatas)
-        pareja_ini = m.get(analyzer["iataInfo"], primer_iata)
-        info_list = me.getValue(pareja_ini)
-        first_ap_str = ""
-        for elemento in lt.iterator(info_list):
-            first_ap_str += elemento
-            first_ap_str += ", "
+        pareja_inicial1 = m.get(analyzer["iataInfo"], primer_iata)
+        info_list1 = me.getValue(pareja_inicial1)
+        first_ap_list = []
+        for elemento in lt.iterator(info_list1):
+            first_ap_list.append(str(elemento))
+
+        ultimo_iata = lt.lastElement(lista_iatas)
+        pareja_final1 = m.get(analyzer["iataInfo"], ultimo_iata)
+        info_list2 = me.getValue(pareja_final1)
+        last_ap_list = []
+        for elemento in lt.iterator(info_list2):
+            last_ap_list.append(str(elemento))
         
-        print("La información del primer aeropuerto cargado es: " + first_ap_str)
+        table1 =[first_ap_list, last_ap_list]
+        headliners1 = ["Name", "City", "Country", "Longitude", "Latitude"]
+        print(tabulate(table1, headers=headliners1, tablefmt="pretty") + "\n")
+        
+        #Second Table
+        num3 = gr.numVertices(analyzer["doubleRoutes"])
+
+        num4 = gr.numEdges(analyzer["doubleRoutes"])
+
+        print("=== Airports-Routes DiGraph ===")
+        print("Nodes: " + str(num1))
+        print("Edges: " + str(num2))
+        print("First & Last Airport loaded in the Digraph." + "\n")
+
+        #Third Table
 
         lista_ciudades = m.keySet(analyzer["cityInfo"])
-        ultima_ciudad = lt.lastElement(lista_ciudades)
-        pareja_ini2 = m.get(analyzer["cityInfo"], ultima_ciudad)
-        info_list2 = me.getValue(pareja_ini2)
-        final_city_str = ""
+        primera_ciudad = lt.firstElement(lista_ciudades)
+        pareja_ini2 = m.get(analyzer["cityInfo"], primera_ciudad)
+        info_list3 = me.getValue(pareja_ini2)
+        chainList1 = ultima_ciudad.split('-')
+        first_city_list = [chainList1[0]]
         for elemento2 in lt.iterator(info_list2):
-            final_city_str += elemento2
-            final_city_str += ", "
+            first_city_list.append(elemento2)
 
-        print("La información de la última ciudad cargada es: " + final_city_str)
+        ultima_ciudad = lt.lastElement(lista_ciudades)
+        pareja_final2 = m.get(analyzer["cityInfo"], ultima_ciudad)
+        info_list4 = me.getValue(pareja_final2)
+        chainList2 = ultima_ciudad.split('-')
+        final_city_list = [chainList2[0]]
+        for elemento2 in lt.iterator(info_list2):
+            final_city_list.append(elemento2)
+
+        table3 = [first_city_list, final_city_list]
+        
+        
 
     elif int(inputs[0]) == 3:
         print(interconection(analyzer))
            
     elif int(inputs[0]) == 4:
-        iataAp1 = input("Ingrese el IATA del primer aeropuerto: ").upper()
-        iataAp2 = input("Ingrese el IATA del segundo aeropuerto: ").upper()
+        iataAp1 = input("Enter the IATA code of the first airport: ").upper()
+        iataAp2 = input("Enter the IATA code of the second airport: ").upper()
         print(clusteres(analyzer, iataAp1, iataAp2))
 
         
     elif int(inputs[0]) == 5:
-        origin = input("Ingrese el nombre de la ciudad de origen: ").upper()
-        destiny = input("Ingrese el nombre de la ciudad de destino: ").upper()
-        print(shortestRoute(analyzer, origin, destiny))        
+        origin = input("Enter the name of the departure city: ").upper()
+        c_origin = chooseCity(analyzer, origin)
+        destiny = input("Enter the name of the destination city: ").upper()
+        c_destiny = chooseCity(analyzer, destiny)
+        print(shortestRoute(analyzer, c_origin, c_destiny))        
 
     elif int(inputs[0]) == 6:
-        origin = input("Ingrese el nombre de la ciudad de origen: ").upper()
-        miles = int(input("Ingrese el numero de millas que el pasajero posee: "))
-        print(travelerMiles(analyzer, origin, miles))
+        origin = input("Enter the name of the departure city: ").upper()
+        miles = int(input("Enter the number of miles that the passenger has: "))
+        c_origin = chooseCity(analyzer, origin)
+        print(travelerMiles(analyzer, c_origin, miles))
 
     elif int(inputs[0]) == 7:
-        closedIata = input("Ingrese el IATA del aeropuerto que esta fuera de funcionamiento: ")
+        closedIata = input("Enter the IATA code of the airport that isn't available: ")
         print(closedEffect(analyzer, closedIata))
 
     elif int(inputs[0]) == 8:
-        origin = input("Ingrese el nombre de la ciudad de origen: ").upper()
-        destiny = input("Ingrese el nombre de la ciudad de destino: ").upper()
-        print(compareWeb(analyzer, origin, destiny))
+        origin = input("Enter the name of the departure city: ").upper()
+        c_origin = chooseCity(analyzer, origin)
+        destiny = input("Enter the name of the destination city: ").upper()
+        c_destiny = chooseCity(analyzer, destiny)
+        print(compareWeb(analyzer, c_origin, c_destiny))
 
     elif int(inputs[0]) == 9:
         print(graphVis())
