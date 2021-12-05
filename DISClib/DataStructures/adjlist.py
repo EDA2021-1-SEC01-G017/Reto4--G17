@@ -330,9 +330,10 @@ def addEdge(graph, vertexa, vertexb, weight):
         edge = e.newEdge(vertexa, vertexb, weight)
         # Se obtienen las listas de adyacencias de cada vertice
         # Se anexa a cada lista el arco correspondiente
+
         entrya = map.get(graph['vertices'], vertexa)
-        
         lt.addLast(entrya['value'], edge)
+        
         if (not graph['directed']):
             entryb = map.get(graph['vertices'], vertexb)
             edgeb = e.newEdge(vertexb, vertexa, weight)

@@ -46,14 +46,87 @@ operación solicitada
 # ___________________________________________________
 
 
-airportfile = 'Skylines//airports_full.csv'
-routefile = 'Skylines//routes_full.csv'
-citiesfile = 'Skylines//worldcities.csv'
+airportfile = 'Skylines//airports-utf8-small.csv'
+routefile = 'Skylines//routes-utf8-small.csv'
+citiesfile = 'Skylines//worldcities-utf8.csv'
 initialStation = None
 
 # ___________________________________________________
 #  Funciones
 # ___________________________________________________
+
+def graph_info(analyzer):
+    #First Table
+    num1 = gr.numVertices(analyzer["vuelos"])
+    num2 = gr.numEdges(analyzer["vuelos"])
+
+    print("=== Airports-Routes DiGraph ===")
+    print("Nodes: " + str(num1))
+    print("Edges: " + str(num2))
+    print("First & Last Airport loaded in the Digraph." + "\n")
+    
+    lista_iatas = m.keySet(analyzer["iataInfo"])
+    primer_iata = lt.firstElement(lista_iatas)
+    pareja_inicial1 = m.get(analyzer["iataInfo"], primer_iata)
+
+    a = gr.vertices(analyzer["vuelos"])
+    tList = []
+    for i in lt.iterator(a):
+        tList.append(i)
+    info_list1 = me.getValue(pareja_inicial1)
+
+    first_ap_list = []
+    for elemento in lt.iterator(info_list1):
+        first_ap_list.append(str(elemento))
+
+    ultimo_iata = lt.lastElement(lista_iatas)
+    pareja_final1 = m.get(analyzer["iataInfo"], ultimo_iata)
+    info_list2 = me.getValue(pareja_final1)
+    last_ap_list = []
+    for elemento in lt.iterator(info_list2):
+        last_ap_list.append(str(elemento))
+    
+    table1 =[first_ap_list, last_ap_list]
+    headliners1 = ["Name", "City", "Country", "Longitude", "Latitude"]
+    print(tabulate(table1, headers=headliners1, tablefmt="grid") + "\n")
+    
+    #Second Table
+    num3 = gr.numVertices(analyzer["doubleRoutes"])
+    num4 = gr.numEdges(analyzer["doubleRoutes"])
+
+    print("=== Airports-Routes Graph ===")
+    print("Nodes: " + str(num3))
+    print("Edges: " + str(num4))
+    print("First & Last Airport loaded in the Graph." + "\n")
+
+    
+    #Third Table
+    num5 = m.size(analyzer["cityInfo"])
+
+    print("=== City Network ===")
+    print("The number of cities are: " + str(num5))
+    print("First & Last City loaded in data structure.")
+
+    lista_ciudades = m.keySet(analyzer["cityInfo"])
+    primera_ciudad = lt.firstElement(lista_ciudades)
+    pareja_ini2 = m.get(analyzer["cityInfo"], primera_ciudad)
+    info_list3 = me.getValue(pareja_ini2)
+    chainList1 = primera_ciudad.split('-')
+    first_city_list = [chainList1[0]]
+    for elemento2 in lt.iterator(info_list3):
+        first_city_list.append(elemento2)
+
+    ultima_ciudad = lt.lastElement(lista_ciudades)
+    pareja_final2 = m.get(analyzer["cityInfo"], ultima_ciudad)
+    info_list4 = me.getValue(pareja_final2)
+    chainList2 = ultima_ciudad.split('-')
+    final_city_list = [chainList2[0]]
+    for elemento2 in lt.iterator(info_list4):
+        final_city_list.append(elemento2)
+
+    table3 = [first_city_list, final_city_list]
+    headliners3 = ["city", "country", "population", "latitude", "longitude", "id"]
+    print(tabulate(table3, headers=headliners3, tablefmt="grid") + "\n")
 
 def interconection(analyzer):
     answer = controller.interconection(analyzer)
@@ -62,7 +135,7 @@ def interconection(analyzer):
     headliners = ["Name", "City", "Country", "IATA", "connections", "inbound", "outbound"]
     print("Connected airports inside network: " + str(len(org)) + "\n")
     print("TOP 5 most connected airports..." + "\n")
-    print(tabulate(table5, headers=headliners, tablefmt="pretty") + "\n")
+    print(tabulate(table5, headers=headliners, tablefmt="grid") + "\n")
      
 def clusteres (analyzer, iataAp1, iataAp2):
     answer = controller.clusteres(analyzer, iataAp1, iataAp2)
@@ -129,74 +202,13 @@ while True:
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
         print("\nInicializando....")
-        
         analyzer = controller.init()
 
     elif int(inputs[0]) == 2:
-        print("\nLoading flies routes....")
+        print("\nLoading flies routes....\n\n")
         controller.loadData(analyzer, airportfile, routefile, citiesfile) 
-
-        #First Table
-        num1 = gr.numVertices(analyzer["vuelos"])
-        num2 = gr.numEdges(analyzer["vuelos"])
-
-        print("=== Airports-Routes DiGraph ===")
-        print("Nodes: " + str(num1))
-        print("Edges: " + str(num2))
-        print("First & Last Airport loaded in the Digraph." + "\n")
+        graph_info(analyzer)
         
-        lista_iatas = m.keySet(analyzer["iataInfo"])
-        primer_iata = lt.firstElement(lista_iatas)
-        pareja_inicial1 = m.get(analyzer["iataInfo"], primer_iata)
-        info_list1 = me.getValue(pareja_inicial1)
-        first_ap_list = []
-        for elemento in lt.iterator(info_list1):
-            first_ap_list.append(str(elemento))
-
-        ultimo_iata = lt.lastElement(lista_iatas)
-        pareja_final1 = m.get(analyzer["iataInfo"], ultimo_iata)
-        info_list2 = me.getValue(pareja_final1)
-        last_ap_list = []
-        for elemento in lt.iterator(info_list2):
-            last_ap_list.append(str(elemento))
-        
-        table1 =[first_ap_list, last_ap_list]
-        headliners1 = ["Name", "City", "Country", "Longitude", "Latitude"]
-        print(tabulate(table1, headers=headliners1, tablefmt="pretty") + "\n")
-        
-        #Second Table
-        num3 = gr.numVertices(analyzer["doubleRoutes"])
-
-        num4 = gr.numEdges(analyzer["doubleRoutes"])
-
-        print("=== Airports-Routes DiGraph ===")
-        print("Nodes: " + str(num1))
-        print("Edges: " + str(num2))
-        print("First & Last Airport loaded in the Digraph." + "\n")
-
-        #Third Table
-
-        lista_ciudades = m.keySet(analyzer["cityInfo"])
-        primera_ciudad = lt.firstElement(lista_ciudades)
-        pareja_ini2 = m.get(analyzer["cityInfo"], primera_ciudad)
-        info_list3 = me.getValue(pareja_ini2)
-        chainList1 = ultima_ciudad.split('-')
-        first_city_list = [chainList1[0]]
-        for elemento2 in lt.iterator(info_list2):
-            first_city_list.append(elemento2)
-
-        ultima_ciudad = lt.lastElement(lista_ciudades)
-        pareja_final2 = m.get(analyzer["cityInfo"], ultima_ciudad)
-        info_list4 = me.getValue(pareja_final2)
-        chainList2 = ultima_ciudad.split('-')
-        final_city_list = [chainList2[0]]
-        for elemento2 in lt.iterator(info_list2):
-            final_city_list.append(elemento2)
-
-        table3 = [first_city_list, final_city_list]
-        
-        
-
     elif int(inputs[0]) == 3:
         print(interconection(analyzer))
            
@@ -204,7 +216,6 @@ while True:
         iataAp1 = input("Enter the IATA code of the first airport: ").upper()
         iataAp2 = input("Enter the IATA code of the second airport: ").upper()
         print(clusteres(analyzer, iataAp1, iataAp2))
-
         
     elif int(inputs[0]) == 5:
         origin = input("Enter the name of the departure city: ").upper()

@@ -87,7 +87,7 @@ def newAnalyzer():
                                      )
         analyzer["vuelos"] = gr.newGraph(datastructure='ADJ_LIST',
                                               directed=True,
-                                              size=20000,
+                                              size=400,
                                               comparefunction=compareroutes
                                               )                              
         analyzer["doubleRoutes"] = gr.newGraph(datastructure='ADJ_LIST',
@@ -120,18 +120,18 @@ def add_edge (analyzer, route):
     b1= route["Departure"]
     b2= route["Destination"]
     b3= float(route["distance_km"])
-    gr.addEdge(analyzer["vuelos"], b1, b2, b3)
+    if b1 != None and b2 != None and b3 != None:
+        gr.addEdge(analyzer["vuelos"], b1, b2, b3)
 
-    #pair = m.get(analyzer["routeMap"], route["Departure"])
-    #value = me.getValue(pair)
+    pair = m.get(analyzer["routeMap"], route["Departure"])
+    value = me.getValue(pair)
 
-    #if lt.isPresent(value, route["Destination"]) == 0:
-    #    lt.addLast(value, route["Destination"])
+    if lt.isPresent(value, route["Destination"]) == 0:
+        lt.addLast(value, route["Destination"])
 
-    #joinKey = route["Departure"] + "-" + route["Destination"]
-    #m.put(analyzer["distances"], joinKey, route["distance_km"])
+    joinKey = route["Departure"] + "-" + route["Destination"]
+    m.put(analyzer["distances"], joinKey, route["distance_km"])
     
-
 def add_city (analyzer, city):
     joinKey = city["city_ascii"].upper() + "-" + city["id"] 
     infoList = lt.newList()

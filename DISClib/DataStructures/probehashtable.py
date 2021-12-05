@@ -318,7 +318,8 @@ def findSlot(map, key, hashvalue, comparefunction):
                     break
             else:                    # la posicion no estaba disponible
                 element = lt.getElement(table, searchpos)
-                if comparefunction(key, element) == 0:  # Es la llave
+                if(key == element['key']):
+                #if comparefunction(key, element) == 0:  # Es la llave
                     return searchpos               # Se  retorna la posicion
             searchpos = (((searchpos) % map['capacity'])+1)
         return -(avail)    # numero negativo indica que el elemento no estaba

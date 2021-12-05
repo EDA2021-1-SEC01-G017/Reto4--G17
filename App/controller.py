@@ -69,12 +69,13 @@ def loadData(analyzer, airportfile, routefile, cityfile):
         model.add_info(analyzer, airport)
 
     for route in input_filerout:  
-        model.add_edge(analyzer, route)
+       model.add_edge(analyzer, route)
     
     for city in input_filecity:
         model.add_city(analyzer, city)
     
-    #model.double_check(analyzer)
+    
+    model.double_check(analyzer)
 
     return analyzer
 
