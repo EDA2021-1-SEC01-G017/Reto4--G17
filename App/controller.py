@@ -106,8 +106,8 @@ def travelerMiles (analyzer, origin, miles):
 def closedEffect (analyzer, closedIata):
     return model.closedEffect(analyzer, closedIata)
 
-def compareWeb (analyzer, origin, destiny):
-    return model.compareWeb(analyzer, origin, destiny)
+def compareWeb ():
+    return model.compareWeb()
 
 def graphVis ():
     return model.graphVis()

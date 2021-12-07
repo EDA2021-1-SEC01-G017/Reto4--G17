@@ -46,8 +46,8 @@ operación solicitada
 # ___________________________________________________
 
 
-airportfile = 'Skylines//airports-utf8-large.csv'
-routefile = 'Skylines//routes-utf8-large.csv'
+airportfile = 'Skylines//airports-utf8-small.csv'
+routefile = 'Skylines//routes-utf8-small.csv'
 citiesfile = 'Skylines//worldcities-utf8.csv'
 initialStation = None
 
@@ -57,6 +57,8 @@ sys.setrecursionlimit(1048576)
 # ___________________________________________________
 
 def graph_info(analyzer):
+
+    inicio = time.time()
     #First Table
     num1 = gr.numVertices(analyzer["vuelos"])
     num2 = gr.numEdges(analyzer["vuelos"])
@@ -147,8 +149,12 @@ def graph_info(analyzer):
     table3 = [first_city_list, final_city_list]
     headliners3 = ["city", "country", "population", "latitude", "longitude", "id"]
     print(tabulate(table3, headers=headliners3, tablefmt="grid") + "\n")
+    final = time.time()
+    tiempo = inicio-final
+    print("TIEMPO: " + str(tiempo))
 
 def interconection(analyzer):
+    inicio = time.time()
     answer = controller.interconection(analyzer)
     org = sorted(answer, key=lambda ans:ans[4], reverse=True)
     table5 = org[:5]
@@ -157,8 +163,12 @@ def interconection(analyzer):
     print("Connected airports inside network: " + str(len(org)))
     print("TOP 5 most connected airports..." + "\n")
     print(tabulate(table5, headers=headliners, tablefmt="grid") + "\n")
-     
+    final = time.time()
+    tiempo = inicio-final
+    print("TIEMPO: " + str(tiempo))
+    
 def clusteres (analyzer, iataAp1, iataAp2):
+    inicio = time.time()
     answer = controller.clusteres(analyzer, iataAp1, iataAp2)
     components = answer[0]
     connection = answer[1]
@@ -187,8 +197,12 @@ def clusteres (analyzer, iataAp1, iataAp2):
     print("- Number of SCC in Airport-Route network: " + str(components))
     print("- Does the " + a_1_L[1] + " and the " + a_2_L[1] + " belong together?")
     print("- ANS:" + str(connection) + "\n")
+    final = time.time()
+    tiempo = inicio-final
+    print("TIEMPO: " + str(tiempo))
 
 def shortestRoute (analyzer, origin, destiny):
+    inicio = time.time()
     answer = controller.shortestRoute(analyzer, origin, destiny)
     table1 = answer[0]
     table2 = answer[1]
@@ -204,8 +218,12 @@ def shortestRoute (analyzer, origin, destiny):
     print(tabulate(table1, headers=headliners1, tablefmt="grid"))
     print("- Trip Stops:")
     print(tabulate(table2, headers=headliners2, tablefmt="grid") + "\n")
+    final = time.time()
+    tiempo = inicio-final
+    print("TIEMPO: " + str(tiempo))
 
 def travelerMiles (analyzer, origin, miles):
+    inicio = time.time()
     selectAP = shortestAirport(analyzer, origin)
     depAp = selectAP[0]
     answer = controller.travelerMiles(analyzer, depAp, miles)
@@ -229,8 +247,12 @@ def travelerMiles (analyzer, origin, miles):
     print("-----")
     print("The passenger needs " + str() + "miles to complete the trip.")
     print("-----" + "\n")
+    final = time.time()
+    tiempo = inicio-final
+    print("TIEMPO: " + str(tiempo))
 
 def closedEffect (analyzer, closedIata):
+    inicio = time.time()
     answer = controller.closedEffect(analyzer, closedIata)
 
     #originals = (orDiVe, orDiEd, orGrVe, orGrEd)
@@ -268,13 +290,17 @@ def closedEffect (analyzer, closedIata):
     print("There are " + str(numAffected) + " Airports affected by the removal of " + closedIata)
     print("The first & last 3 Airports affected are:")
     print(tabulate(table, headers=headliners, tablefmt="grid"))
+    final = time.time()
+    tiempo = inicio-final
+    print("TIEMPO: " + str(tiempo))
 
-
-def compareWeb (analyzer, origin, destiny):
-    answer = controller.compareWeb(analyzer, origin, destiny)
+def compareWeb ():
+    answer = controller.compareWeb()
+    print("This option is not available at this moment...")
 
 def graphVis ():
     answer = controller.graphVis()
+    print("This option is not available at this moment...")
 
 def chooseCity (analyzer, city):
     answer = controller.chooseCity(analyzer, city)
@@ -295,17 +321,16 @@ def shortestAirport (analyzer, city):
 
 def printMenu():
     print("Bienvenido")
-    print("1- Initialize Analyzer")
-    print("2- Load flights information")
-    print("3- REQ1 - Interconnection")
-    print("4- REQ2 - Clusters")
-    print("5- REQ3 - Shortest Route")
-    print("6- REQ4 - Miles")
-    print("7- REQ5 - Closed Airport")
-    print("8- REQ6BONO-Visualize")
+    print("1- Initialize and Load Analyzer")
+    print("2- REQ1 - Interconnection")
+    print("3- REQ2 - Clusters")
+    print("4- REQ3 - Shortest Route")
+    print("5- REQ4 - Miles")
+    print("6- REQ5 - Closed Airport")
+    print("7- REQ6 - Compare Web")
+    print("8- REQ7 - Visualize")
     print("0- Exit")
     print("*******************************************")
-
 
 
 """
@@ -317,21 +342,19 @@ while True:
     if int(inputs[0]) == 1:
         print("\nInicializando....")
         analyzer = controller.init()
+        controller.loadData(analyzer, airportfile, routefile, citiesfile) 
+        graph_info(analyzer)
 
     elif int(inputs[0]) == 2:
         print("\nLoading flies routes....\n\n")
-        controller.loadData(analyzer, airportfile, routefile, citiesfile) 
-        graph_info(analyzer)
+        print(interconection(analyzer))
         
     elif int(inputs[0]) == 3:
-        print(interconection(analyzer))
-           
-    elif int(inputs[0]) == 4:
         iataAp1 = input("Enter the IATA code of the first airport: ").upper()
         iataAp2 = input("Enter the IATA code of the second airport: ").upper()
         print(clusteres(analyzer, iataAp1, iataAp2))
-        
-    elif int(inputs[0]) == 5:
+           
+    elif int(inputs[0]) == 4:
         origin = input("Enter the name of the departure city: ").upper()
         c_origin = chooseCity(analyzer, origin)
         destiny = input("Enter the name of the destination city: ").upper()
@@ -340,7 +363,11 @@ while True:
         source = ap1[0]
         ap2 = shortestAirport(analyzer, c_destiny)
         vertex = ap2[0]
-        print(shortestRoute(analyzer, source, vertex))        
+        print(shortestRoute(analyzer, source, vertex)) 
+
+    elif int(inputs[0]) == 5:
+        closedIata = input("Closing the airport with IATA code: ")
+        print(closedEffect(analyzer, closedIata))
 
     elif int(inputs[0]) == 6:
         origin = input("Enter the name of the departure city: ").upper()
@@ -349,17 +376,9 @@ while True:
         print(travelerMiles(analyzer, c_origin, miles))
 
     elif int(inputs[0]) == 7:
-        closedIata = input("Closing the airport with IATA code: ")
-        print(closedEffect(analyzer, closedIata))
+        print(compareWeb())
 
     elif int(inputs[0]) == 8:
-        origin = input("Enter the name of the departure city: ").upper()
-        c_origin = chooseCity(analyzer, origin)
-        destiny = input("Enter the name of the destination city: ").upper()
-        c_destiny = chooseCity(analyzer, destiny)
-        print(compareWeb(analyzer, c_origin, c_destiny))
-
-    elif int(inputs[0]) == 9:
         print(graphVis())
 
     else:

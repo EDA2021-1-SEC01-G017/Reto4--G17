@@ -213,7 +213,6 @@ def shortestRoute (analyzer, origin, destiny):
     flightList = []
     for i in lt.iterator(recorrido):
         flightList.append(i)
-    
     j = 0
     table1 = []
     route = []
@@ -229,7 +228,6 @@ def shortestRoute (analyzer, origin, destiny):
         else:
             route.append(dic["vertexB"])
         j += 1
-
     table2 = []
     for iata in route:
         pair = m.get(analyzer["iataInfo"], iata)
@@ -241,7 +239,6 @@ def shortestRoute (analyzer, origin, destiny):
                 linea2.append(element)
             k += 1
         table2.append(linea2)
-
     answerTuple = (table1, table2)
     return answerTuple
 
@@ -252,28 +249,21 @@ def travelerMiles (analyzer, origin, miles):
 
 def closedEffect (analyzer, closedIata):
     table = []
-
     orDiVe = gr.numVertices(analyzer["vuelos"])
     orDiEd = gr.numEdges(analyzer["vuelos"])
     orGrVe = gr.numVertices(analyzer["doubleRoutes"])
     orGrEd = gr.numEdges(analyzer["doubleRoutes"])
-
     n1 = gr.adjacents(analyzer["vuelos"], closedIata)
     apDiVe = lt.size(n1)
     apDiEd = gr.degree(analyzer["vuelos"], closedIata)
-
     n2 = gr.adjacents(analyzer["doubleRoutes"], closedIata)
     apGrVe = lt.size(n2)
     apGrEd = gr.degree(analyzer["doubleRoutes"], closedIata)
-
     iataAffected = []
-
     for j in lt.iterator(n2):
         if j not in iataAffected:
             iataAffected.append(j)
-
     numAffected = len(iataAffected)
-    
     for iata in iataAffected:
         pair = m.get(analyzer["iataInfo"], iata)
         value = me.getValue(pair)
@@ -291,7 +281,7 @@ def closedEffect (analyzer, closedIata):
 
     return answer
 
-def compareWeb (analyzer, origin, destiny):
+def compareWeb ():
     pass
 
 def graphVis ():
