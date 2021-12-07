@@ -34,6 +34,7 @@ from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import list as lt
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
+from DISClib.Algorithms.Graphs import prim as pr
 from DISClib.Utils import error as error
 
 assert config
@@ -245,10 +246,50 @@ def shortestRoute (analyzer, origin, destiny):
     return answerTuple
 
 def travelerMiles (analyzer, origin, miles):
+    prim = pr.PrimMST(analyzer["doubleRoutes"])
+    kmAvailable = float(miles) * 1.6
     pass
 
 def closedEffect (analyzer, closedIata):
-    pass
+    table = []
+
+    orDiVe = gr.numVertices(analyzer["vuelos"])
+    orDiEd = gr.numEdges(analyzer["vuelos"])
+    orGrVe = gr.numVertices(analyzer["doubleRoutes"])
+    orGrEd = gr.numEdges(analyzer["doubleRoutes"])
+
+    n1 = gr.adjacents(analyzer["vuelos"], closedIata)
+    apDiVe = lt.size(n1)
+    apDiEd = gr.degree(analyzer["vuelos"], closedIata)
+
+    n2 = gr.adjacents(analyzer["doubleRoutes"], closedIata)
+    apGrVe = lt.size(n2)
+    apGrEd = gr.degree(analyzer["doubleRoutes"], closedIata)
+
+    iataAffected = []
+
+    for j in lt.iterator(n2):
+        if j not in iataAffected:
+            iataAffected.append(j)
+
+    numAffected = len(iataAffected)
+    
+    for iata in iataAffected:
+        pair = m.get(analyzer["iataInfo"], iata)
+        value = me.getValue(pair)
+        linea = [iata]
+        i = 0
+        for element in lt.iterator(value):
+            if i > 2:
+                break
+            linea.append(element)
+            i+=1
+        table.append(linea)
+    originals = (orDiVe, orDiEd, orGrVe, orGrEd)
+    airports = (apDiVe, apDiEd, apGrVe, apGrEd)
+    answer = (table, originals, airports, numAffected)
+
+    return answer
 
 def compareWeb (analyzer, origin, destiny):
     pass

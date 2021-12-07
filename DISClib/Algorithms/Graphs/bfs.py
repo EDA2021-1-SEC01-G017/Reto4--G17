@@ -24,7 +24,7 @@
  *
  """
 
-import config
+from App import config
 from DISClib.ADT import graph as g
 from DISClib.ADT import queue
 from DISClib.ADT import map as map

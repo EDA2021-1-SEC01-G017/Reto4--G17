@@ -46,8 +46,8 @@ operación solicitada
 # ___________________________________________________
 
 
-airportfile = 'Skylines//airports-utf8-large.csv'
-routefile = 'Skylines//routes-utf8-large.csv'
+airportfile = 'Skylines//airports-utf8-small.csv'
+routefile = 'Skylines//routes-utf8-small.csv'
 citiesfile = 'Skylines//worldcities-utf8.csv'
 initialStation = None
 
@@ -205,10 +205,69 @@ def shortestRoute (analyzer, origin, destiny):
     print(tabulate(table2, headers=headliners2, tablefmt="grid") + "\n")
 
 def travelerMiles (analyzer, origin, miles):
-    answer = controller.travelerMiles(analyzer, origin, miles)
+    selectAP = shortestAirport(analyzer, origin)
+    depAp = selectAP[0]
+    answer = controller.travelerMiles(analyzer, depAp, miles)
+    table1 = []
+    table2 = []
+    avKilo = float(miles) * 1.6
+    numAp = 0
+    print("=== Req No. 4 Answer ===")
+    headliners1 = ["IATA", "Name", "City", "Country"]
+    print(tabulate(table1, headers=headliners1, tablefmt="grid") + "\n")
+
+    print("- Number of possible airports: " + str(numAp) + ".")
+    print("- Max travelling distance between airports: " + str() + " (km).")
+    print("- Passenger available travelling miles: " + str(avKilo) + " (km).\n")
+
+    headliners2 = ["Airline", "Departure", "Destination", "distance_km"]
+    print("+++ Longest possible route with airport " + depAp + " +++")
+    print("- Longests possible path distance: " + str() + " (km).")
+    print("- Longests possible path details:")
+    print(tabulate(table2, headers=headliners2, tablefmt="grid") + "\n")
+    print("-----")
+    print("The passenger needs " + str() + "miles to complete the trip.")
+    print("-----" + "\n")
 
 def closedEffect (analyzer, closedIata):
     answer = controller.closedEffect(analyzer, closedIata)
+
+    #originals = (orDiVe, orDiEd, orGrVe, orGrEd)
+    #airports = (apDiVe, apDiEd, apGrVe, apGrEd)
+    #answer = (table, originals, airports, numAffected)
+
+    table = answer[0]
+
+    num1 = answer[1][0]
+    num2 = answer[1][1]
+    num3 = answer[1][2]
+    num4 = answer[1][3]
+
+    num5 = answer[2][0]
+    num6 = answer[2][1]
+    num7 = answer[2][2]
+    num8 = answer[2][3]
+    
+    numAffected = answer[3]
+    
+    headliners = ["IATA", "Name", "City", "Country"]
+
+    print("--- Airports-Routes Digraph ---")
+    print("Original number of Airports: " + str(num1) + " and Routes: " + str(num2))
+    print("--- Airports-Routes Graph ---")
+    print("Original number of Airports: " + str(num3) + " and Routes: " + str(num4) + "\n")
+    
+    print("+++ Removing Airport with IATA: " + closedIata + " +++\n")
+
+    print("--- Airports-Routes Digraph ---")
+    print("Resulting number of Airports: " + str(num1-num5) + " and Routes: " + str(num2-num6))
+    print("--- Airports-Routes Graph ---")
+    print("Resulting number of Airports: " + str(num3-num7) + " and Routes: " + str(num4-num8) + "\n")
+
+    print("There are " + str(numAffected) + " Airports affected by the removal of " + closedIata)
+    print("The first & last 3 Airports affected are:")
+    print(tabulate(table, headers=headliners, tablefmt="grid"))
+
 
 def compareWeb (analyzer, origin, destiny):
     answer = controller.compareWeb(analyzer, origin, destiny)
@@ -237,7 +296,7 @@ def printMenu():
     print("Bienvenido")
     print("1- Inicializar Analizador")
     print("2- Cargar información de VUELOS")
-    print("3- REQ1- ")
+    print("3- REQ1-")
     print("4- REQ2-")
     print("5- REQ3-")
     print("6- REQ4-")
@@ -289,7 +348,7 @@ while True:
         print(travelerMiles(analyzer, c_origin, miles))
 
     elif int(inputs[0]) == 7:
-        closedIata = input("Enter the IATA code of the airport that isn't available: ")
+        closedIata = input("Closing the airport with IATA code: ")
         print(closedEffect(analyzer, closedIata))
 
     elif int(inputs[0]) == 8:

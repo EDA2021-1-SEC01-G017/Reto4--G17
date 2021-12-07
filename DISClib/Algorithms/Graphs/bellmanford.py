@@ -25,7 +25,7 @@
 """
 
 
-import config
+from App import config
 from DISClib.DataStructures import edge as e
 from DISClib.ADT import list as lt
 from DISClib.ADT import queue as q
