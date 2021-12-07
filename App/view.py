@@ -46,11 +46,12 @@ operación solicitada
 # ___________________________________________________
 
 
-airportfile = 'Skylines//airports-utf8-small.csv'
-routefile = 'Skylines//routes-utf8-small.csv'
+airportfile = 'Skylines//airports-utf8-large.csv'
+routefile = 'Skylines//routes-utf8-large.csv'
 citiesfile = 'Skylines//worldcities-utf8.csv'
 initialStation = None
 
+sys.setrecursionlimit(1048576)
 # ___________________________________________________
 #  Funciones
 # ___________________________________________________
@@ -294,15 +295,15 @@ def shortestAirport (analyzer, city):
 
 def printMenu():
     print("Bienvenido")
-    print("1- Inicializar Analizador")
-    print("2- Cargar información de VUELOS")
-    print("3- REQ1-")
-    print("4- REQ2-")
-    print("5- REQ3-")
-    print("6- REQ4-")
-    print("7- REQ5-")
-    print("8- REQ6BONO-Visualizar avistamientos en una zona geográfica /--Long(Limite máx y min) Lat(Límite máx y min)--/")
-    print("0- Salir")
+    print("1- Initialize Analyzer")
+    print("2- Load flights information")
+    print("3- REQ1 - Interconnection")
+    print("4- REQ2 - Clusters")
+    print("5- REQ3 - Shortest Route")
+    print("6- REQ4 - Miles")
+    print("7- REQ5 - Closed Airport")
+    print("8- REQ6BONO-Visualize")
+    print("0- Exit")
     print("*******************************************")
 
 
