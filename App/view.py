@@ -20,7 +20,7 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
-import time
+from timeit import default_timer
 import config as cf
 import sys
 import threading
@@ -46,10 +46,9 @@ operación solicitada
 # ___________________________________________________
 
 
-airportfile = 'Skylines//airports-utf8-small.csv'
-routefile = 'Skylines//routes-utf8-small.csv'
+airportfile = 'Skylines//airports-utf8-large.csv'
+routefile = 'Skylines//routes-utf8-large.csv'
 citiesfile = 'Skylines//worldcities-utf8.csv'
-initialStation = None
 
 sys.setrecursionlimit(1048576)
 # ___________________________________________________
@@ -58,7 +57,6 @@ sys.setrecursionlimit(1048576)
 
 def graph_info(analyzer):
 
-    inicio = time.time()
     #First Table
     num1 = gr.numVertices(analyzer["vuelos"])
     num2 = gr.numEdges(analyzer["vuelos"])
@@ -95,10 +93,10 @@ def graph_info(analyzer):
     
     #Second Table
     num3 = gr.numVertices(analyzer["doubleRoutes"])
-    num4 = gr.numEdges(analyzer["doubleRoutes"])
+    num4 = int(gr.numEdges(analyzer["doubleRoutes"])/2)
 
     print("=== Airports-Routes Graph ===")
-    print("Nodes: " + str(num3))
+    print("Nodes: " + str(num1))
     print("Edges: " + str(num4))
     print("First & Last Airport loaded in the Graph." + "\n")
 
@@ -149,12 +147,9 @@ def graph_info(analyzer):
     table3 = [first_city_list, final_city_list]
     headliners3 = ["city", "country", "population", "latitude", "longitude", "id"]
     print(tabulate(table3, headers=headliners3, tablefmt="grid") + "\n")
-    final = time.time()
-    tiempo = inicio-final
-    print("TIEMPO: " + str(tiempo))
-
+    
 def interconection(analyzer):
-    inicio = time.time()
+    
     answer = controller.interconection(analyzer)
     org = sorted(answer, key=lambda ans:ans[4], reverse=True)
     table5 = org[:5]
@@ -163,12 +158,9 @@ def interconection(analyzer):
     print("Connected airports inside network: " + str(len(org)))
     print("TOP 5 most connected airports..." + "\n")
     print(tabulate(table5, headers=headliners, tablefmt="grid") + "\n")
-    final = time.time()
-    tiempo = inicio-final
-    print("TIEMPO: " + str(tiempo))
-    
+  
 def clusteres (analyzer, iataAp1, iataAp2):
-    inicio = time.time()
+    
     answer = controller.clusteres(analyzer, iataAp1, iataAp2)
     components = answer[0]
     connection = answer[1]
@@ -197,12 +189,9 @@ def clusteres (analyzer, iataAp1, iataAp2):
     print("- Number of SCC in Airport-Route network: " + str(components))
     print("- Does the " + a_1_L[1] + " and the " + a_2_L[1] + " belong together?")
     print("- ANS:" + str(connection) + "\n")
-    final = time.time()
-    tiempo = inicio-final
-    print("TIEMPO: " + str(tiempo))
 
 def shortestRoute (analyzer, origin, destiny):
-    inicio = time.time()
+    
     answer = controller.shortestRoute(analyzer, origin, destiny)
     table1 = answer[0]
     table2 = answer[1]
@@ -218,53 +207,38 @@ def shortestRoute (analyzer, origin, destiny):
     print(tabulate(table1, headers=headliners1, tablefmt="grid"))
     print("- Trip Stops:")
     print(tabulate(table2, headers=headliners2, tablefmt="grid") + "\n")
-    final = time.time()
-    tiempo = inicio-final
-    print("TIEMPO: " + str(tiempo))
 
-def travelerMiles (analyzer, origin, miles):
-    inicio = time.time()
-    selectAP = shortestAirport(analyzer, origin)
-    depAp = selectAP[0]
-    answer = controller.travelerMiles(analyzer, depAp, miles)
-    table1 = []
-    table2 = []
+def travelerMiles (analyzer, miles):
+    
+    answer = controller.travelerMiles(analyzer, miles)
+    table1 = answer[0]
+    table2 = answer[1]
+    
     avKilo = float(miles) * 1.6
-    numAp = 0
-    print("=== Req No. 4 Answer ===")
+    numAp = len(table1)
+    print("=== Req No. 4 Answer ===\n")
     headliners1 = ["IATA", "Name", "City", "Country"]
     print(tabulate(table1, headers=headliners1, tablefmt="grid") + "\n")
 
+    print("- Possible airports information: ")
     print("- Number of possible airports: " + str(numAp) + ".")
-    print("- Max travelling distance between airports: " + str() + " (km).")
     print("- Passenger available travelling miles: " + str(avKilo) + " (km).\n")
 
-    headliners2 = ["Airline", "Departure", "Destination", "distance_km"]
-    print("+++ Longest possible route with airport " + depAp + " +++")
-    print("- Longests possible path distance: " + str() + " (km).")
-    print("- Longests possible path details:")
+    headliners2 = ["Departure", "Destination", "distance_km"]
+    print("- Possible path details:")
     print(tabulate(table2, headers=headliners2, tablefmt="grid") + "\n")
-    print("-----")
-    print("The passenger needs " + str() + "miles to complete the trip.")
-    print("-----" + "\n")
-    final = time.time()
-    tiempo = inicio-final
-    print("TIEMPO: " + str(tiempo))
+    print("\n")
 
 def closedEffect (analyzer, closedIata):
-    inicio = time.time()
+    
     answer = controller.closedEffect(analyzer, closedIata)
-
-    #originals = (orDiVe, orDiEd, orGrVe, orGrEd)
-    #airports = (apDiVe, apDiEd, apGrVe, apGrEd)
-    #answer = (table, originals, airports, numAffected)
-
-    table = answer[0]
+    todos = answer[0]
+    table = [todos[0], todos[1], todos[2], todos[-3], todos[-2], todos[-1]]
 
     num1 = answer[1][0]
     num2 = answer[1][1]
     num3 = answer[1][2]
-    num4 = answer[1][3]
+    num4 = (answer[1][3])/2
 
     num5 = answer[2][0]
     num6 = answer[2][1]
@@ -278,21 +252,18 @@ def closedEffect (analyzer, closedIata):
     print("--- Airports-Routes Digraph ---")
     print("Original number of Airports: " + str(num1) + " and Routes: " + str(num2))
     print("--- Airports-Routes Graph ---")
-    print("Original number of Airports: " + str(num3) + " and Routes: " + str(num4) + "\n")
+    print("Original number of Airports: " + str(num3) + " and Routes: " + str(int(num4)) + "\n")
     
     print("+++ Removing Airport with IATA: " + closedIata + " +++\n")
 
     print("--- Airports-Routes Digraph ---")
-    print("Resulting number of Airports: " + str(num1-num5) + " and Routes: " + str(num2-num6))
+    print("Resulting number of Airports: " + str(num1-num5) + " and Routes: " + str(int(num2-num6)))
     print("--- Airports-Routes Graph ---")
-    print("Resulting number of Airports: " + str(num3-num7) + " and Routes: " + str(num4-num8) + "\n")
+    print("Resulting number of Airports: " + str(num1-num7) + " and Routes: " + str(int(num4-num8)) + "\n")
 
     print("There are " + str(numAffected) + " Airports affected by the removal of " + closedIata)
     print("The first & last 3 Airports affected are:")
     print(tabulate(table, headers=headliners, tablefmt="grid"))
-    final = time.time()
-    tiempo = inicio-final
-    print("TIEMPO: " + str(tiempo))
 
 def compareWeb ():
     answer = controller.compareWeb()
@@ -338,42 +309,65 @@ Menu principal
 """
 while True:
     printMenu()
-    inputs = input('Seleccione una opción para continuar\n')
+    inputs = input('To continue, please select an option: \n')
     if int(inputs[0]) == 1:
+        inicio1 = default_timer()
         print("\nInicializando....")
         analyzer = controller.init()
         controller.loadData(analyzer, airportfile, routefile, citiesfile) 
         graph_info(analyzer)
+        fin1 = default_timer()
+        tiempo1 = fin1-inicio1
+        print("TIEMPO: " + str(tiempo1))
 
     elif int(inputs[0]) == 2:
+        inicio2 = default_timer()
         print("\nLoading flies routes....\n\n")
         print(interconection(analyzer))
+        fin2 = default_timer()
+        tiempo2 = fin2-inicio2
+        print("TIME: " + str(tiempo2))
         
     elif int(inputs[0]) == 3:
+        
         iataAp1 = input("Enter the IATA code of the first airport: ").upper()
         iataAp2 = input("Enter the IATA code of the second airport: ").upper()
+        inicio3 = default_timer()
         print(clusteres(analyzer, iataAp1, iataAp2))
+        fin3 = default_timer()
+        tiempo3 = fin3-inicio3
+        print("TIME: " + str(tiempo3))
            
     elif int(inputs[0]) == 4:
         origin = input("Enter the name of the departure city: ").upper()
         c_origin = chooseCity(analyzer, origin)
         destiny = input("Enter the name of the destination city: ").upper()
         c_destiny = chooseCity(analyzer, destiny)
+        inicio4 = default_timer()
         ap1 = shortestAirport(analyzer, c_origin)
         source = ap1[0]
         ap2 = shortestAirport(analyzer, c_destiny)
         vertex = ap2[0]
         print(shortestRoute(analyzer, source, vertex)) 
+        fin4 = default_timer()
+        tiempo4 = fin4-inicio4
+        print("TIME: " + str(tiempo4))
 
     elif int(inputs[0]) == 5:
-        closedIata = input("Closing the airport with IATA code: ")
-        print(closedEffect(analyzer, closedIata))
+        miles = int(input("Enter the number of miles that the passenger has: "))
+        inicio6 = default_timer()
+        print(travelerMiles(analyzer, miles))
+        fin6 = default_timer()
+        tiempo6 = fin6-inicio6
+        print("TIME: " + str(tiempo6))
 
     elif int(inputs[0]) == 6:
-        origin = input("Enter the name of the departure city: ").upper()
-        miles = int(input("Enter the number of miles that the passenger has: "))
-        c_origin = chooseCity(analyzer, origin)
-        print(travelerMiles(analyzer, c_origin, miles))
+        closedIata = input("Closing the airport with IATA code: ").upper()
+        inicio5 = default_timer()
+        print(closedEffect(analyzer, closedIata))
+        fin5 = default_timer()
+        tiempo5 = fin5-inicio5
+        print("TIME: " + str(tiempo5))
 
     elif int(inputs[0]) == 7:
         print(compareWeb())

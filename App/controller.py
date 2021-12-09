@@ -100,8 +100,8 @@ def clusteres (analyzer, iataAp1, iataAp2):
 def shortestRoute (analyzer, origin, destiny):
     return model.shortestRoute(analyzer, origin, destiny)
 
-def travelerMiles (analyzer, origin, miles):
-    return model.travelerMiles(analyzer, origin, miles)
+def travelerMiles (analyzer, miles):
+    return model.travelerMiles(analyzer, miles)
 
 def closedEffect (analyzer, closedIata):
     return model.closedEffect(analyzer, closedIata)

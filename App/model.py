@@ -122,11 +122,10 @@ def add_info (analyzer, airport):
     line = [airport["IATA"], airport["Latitude"], airport["Longitude"]]
     analyzer["iataLocation"].append(line)
 
-
 def add_edge (analyzer, route):
     b1= route["Departure"]
     b2= route["Destination"]
-    b3= float(route["distance_km"])
+    b3= eval(route["distance_km"])
     if b1 != None and b2 != None and b3 != None:
         gr.addEdge(analyzer["vuelos"], b1, b2, b3)
 
@@ -169,7 +168,7 @@ def double_check(analyzer):
                 join_key = dep + "-" + des
                 distance_pair = m.get(analyzer["distances"], join_key)
                 distance_val = me.getValue(distance_pair)
-                gr.addEdge(analyzer["doubleRoutes"], dep, des, distance_val)
+                gr.addEdge(analyzer["doubleRoutes"], dep, des, eval(distance_val))
                 pos_del1 = lt.isPresent(value1, des)
                 pos_del2 = lt.isPresent(value2, dep)
                 #lt.deleteElement(value1, pos_del1)
@@ -179,11 +178,10 @@ def interconection (analyzer):
     iataList = m.keySet(analyzer["iataInfo"])
     table = []
     for iata in lt.iterator(iataList):
-        vertexList = gr.adjacents(analyzer["vuelos"], iata)
         inNumb = int(gr.indegree(analyzer["vuelos"], iata))
         outNumb = int(gr.outdegree(analyzer["vuelos"], iata))
         numVertex = inNumb + outNumb
-        line = []
+        line = []                    
         path = m.get(analyzer["iataInfo"], iata)
         values = me.getValue(path)
         nombre = lt.getElement(values, 1)
@@ -242,10 +240,40 @@ def shortestRoute (analyzer, origin, destiny):
     answerTuple = (table1, table2)
     return answerTuple
 
-def travelerMiles (analyzer, origin, miles):
+def travelerMiles (analyzer, miles):
     prim = pr.PrimMST(analyzer["doubleRoutes"])
-    kmAvailable = float(miles) * 1.6
-    pass
+    sub1 = prim["edgeTo"]
+    sub2 = sub1["table"]
+    sub3 = sub2["elements"]
+    iataList = []
+    table2 = []
+    for dic in sub3:
+        llave = me.getKey(dic)
+        line2 = []
+        if llave != None:
+            valor = me.getValue(dic)
+            line2.append(valor["vertexA"])
+            if valor["vertexA"] not in iataList:
+                iataList.append(valor["vertexA"])
+            line2.append(valor["vertexB"])
+            if valor["vertexB"] not in iataList:
+                iataList.append(valor["vertexB"])
+            line2.append(valor["weight"])
+            table2.append(line2)
+    table1 = []
+    for iata in iataList:
+        pair = m.get(analyzer["iataInfo"], iata)
+        value = me.getValue(pair)
+        i = 0
+        line1 = [iata]
+        for element in lt.iterator(value):
+            if i < 3:
+                line1.append(element)
+            i += 1
+        table1.append(line1)
+
+    answer = (table1, table2)
+    return answer
 
 def closedEffect (analyzer, closedIata):
     table = []
