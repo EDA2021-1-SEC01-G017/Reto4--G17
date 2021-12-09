@@ -212,21 +212,24 @@ def travelerMiles (analyzer, miles):
     
     answer = controller.travelerMiles(analyzer, miles)
     table1 = answer[0]
+    table1f = [table1[0], table1[1], table1[2], table1[-3], table1[-2], table1[-1]]
     table2 = answer[1]
+    table2f = [table2[0], table2[1], table2[2], table2[-3], table2[-2], table2[-1]]
     
     avKilo = float(miles) * 1.6
     numAp = len(table1)
     print("=== Req No. 4 Answer ===\n")
     headliners1 = ["IATA", "Name", "City", "Country"]
-    print(tabulate(table1, headers=headliners1, tablefmt="grid") + "\n")
+    print("These are the first and last 3 airports available: ")
+    print(tabulate(table1f, headers=headliners1, tablefmt="grid") + "\n")
 
     print("- Possible airports information: ")
     print("- Number of possible airports: " + str(numAp) + ".")
     print("- Passenger available travelling miles: " + str(avKilo) + " (km).\n")
 
     headliners2 = ["Departure", "Destination", "distance_km"]
-    print("- Possible path details:")
-    print(tabulate(table2, headers=headliners2, tablefmt="grid") + "\n")
+    print("- These are the first and last 3 of the possible path details:")
+    print(tabulate(table2f, headers=headliners2, tablefmt="grid") + "\n")
     print("\n")
 
 def closedEffect (analyzer, closedIata):
